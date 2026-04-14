@@ -9,15 +9,17 @@ export default function ChordChip({ label, selected, onClick }: ChordChipProps) 
     <button
       type="button"
       onClick={onClick}
-      className={`px-4 py-2 rounded-md font-body font-medium text-sm transition-all duration-200 ${
-        selected
-          ? "chip-active"
-          : "text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-bright)]"
-      }`}
+      className="px-4 py-2 rounded-md font-body font-medium text-sm transition-all duration-200"
       style={
-        !selected
-          ? { background: "var(--color-surface-variant)" }
-          : undefined
+        selected
+          ? {
+              background: "var(--color-primary)",
+              color: "var(--color-on-primary)",
+            }
+          : {
+              background: "var(--color-surface-variant)",
+              color: "var(--color-on-surface-variant)",
+            }
       }
       aria-pressed={selected}
     >

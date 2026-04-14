@@ -65,10 +65,22 @@ export const useTrainingStore = create<TrainingState>((set) => ({
     }),
 
   selectAllTriads: () =>
-    set((state) => ({ config: { ...state.config, triads: ALL_TRIADS } })),
+    set((state) => ({
+      config: {
+        ...state.config,
+        triads:
+          state.config.triads.length === ALL_TRIADS.length ? [] : ALL_TRIADS,
+      },
+    })),
 
   selectAllTetrads: () =>
-    set((state) => ({ config: { ...state.config, tetrads: ALL_TETRADS } })),
+    set((state) => ({
+      config: {
+        ...state.config,
+        tetrads:
+          state.config.tetrads.length === ALL_TETRADS.length ? [] : ALL_TETRADS,
+      },
+    })),
 
   setTargetNotes: (targetNotes) =>
     set((state) => ({ config: { ...state.config, targetNotes } })),

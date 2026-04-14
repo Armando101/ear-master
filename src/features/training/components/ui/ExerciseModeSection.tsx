@@ -90,7 +90,7 @@ export default function ExerciseModeSection({
               graphic_eq
             </span>
           </div>
-          <p className="text-[10px] text-[var(--color-secondary)] font-bold uppercase tracking-widest mb-2">
+          <p className="text-[10px] text-[var(--color-primary)] font-bold uppercase tracking-widest mb-2">
             Preview
           </p>
           <h4 className="font-headline text-lg font-bold mb-1">

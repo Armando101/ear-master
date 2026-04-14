@@ -19,10 +19,13 @@ export default function HarmonicBaseSection({
   onSelectAllTriads,
   onSelectAllTetrads,
 }: HarmonicBaseSectionProps) {
+  const allTriadsSelected = selectedTriads.length === TRIADS.length;
+  const allTetradsSelected = selectedTetrads.length === TETRADS.length;
+
   return (
     <div className="bg-[var(--color-surface-container-low)] p-8 rounded-xl">
       <h3 className="font-headline text-xl font-bold mb-6 flex items-center gap-3">
-        <span className="material-symbols-outlined text-[var(--color-secondary)]">layers</span>
+        <span className="material-symbols-outlined text-[var(--color-tertiary)]">layers</span>
         Harmonic Base
       </h3>
 
@@ -36,9 +39,10 @@ export default function HarmonicBaseSection({
             <button
               type="button"
               onClick={onSelectAllTriads}
-              className="text-xs text-[var(--color-primary)] font-bold hover:underline"
+              className="text-xs font-bold hover:underline transition-colors"
+              style={{ color: allTriadsSelected ? "var(--color-error)" : "var(--color-primary)" }}
             >
-              Select All
+              {allTriadsSelected ? "Deselect All" : "Select All"}
             </button>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -62,9 +66,10 @@ export default function HarmonicBaseSection({
             <button
               type="button"
               onClick={onSelectAllTetrads}
-              className="text-xs text-[var(--color-primary)] font-bold hover:underline"
+              className="text-xs font-bold hover:underline transition-colors"
+              style={{ color: allTetradsSelected ? "var(--color-error)" : "var(--color-primary)" }}
             >
-              Select All
+              {allTetradsSelected ? "Deselect All" : "Select All"}
             </button>
           </div>
           <div className="flex flex-wrap gap-2">
