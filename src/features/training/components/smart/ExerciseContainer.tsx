@@ -26,6 +26,7 @@ export default function ExerciseContainer() {
   const { config, setSessionResult } = useTrainingStore();
 
   const [currentExercise, setCurrentExercise] = useState(1);
+  const [correctCount, setCorrectCount] = useState(0);
   const [activeStep, setActiveStep] = useState<ExerciseStep>(3);
   const [slots, setSlots] = useState<(IntervalSymbol | null)[]>(() =>
     config.melodicSequence ? [null, null, null] : [null]
@@ -62,7 +63,10 @@ export default function ExerciseContainer() {
       setIntervalStates(newStates);
       setIsAnswered(true);
       setFeedbackCorrect(isCorrect);
-      if (isCorrect) fireConfetti();
+      if (isCorrect) {
+        setCorrectCount((n) => n + 1);
+        fireConfetti();
+      }
     },
     [fireConfetti]
   );
@@ -78,13 +82,11 @@ export default function ExerciseContainer() {
   const handleIntervalSelect = (symbol: IntervalSymbol) => {
     if (isAnswered) return;
     if (!config.melodicSequence) {
-      // Single note — immediate answer
       const newSlots = [symbol];
       setSlots([symbol]);
       checkAnswer(newSlots);
       return;
     }
-    // Fill next empty slot
     const nextEmpty = currentSlots.findIndex((s) => s === null);
     if (nextEmpty === -1) return;
     const updated = [...slots];
@@ -102,26 +104,32 @@ export default function ExerciseContainer() {
     setSlots(updated);
   };
 
-  const handleNext = () => {
-    if (currentExercise >= config.count) {
-      // Go to results with mock data
+  /** Push results based on exercises actually completed so far */
+  const pushResults = useCallback(
+    (doneCount: number, doneCorrect: number) => {
       setSessionResult({
-        correct: Math.floor(config.count * 0.8),
-        total: config.count,
-        timeElapsed: "12:44",
+        correct: doneCorrect,
+        total: doneCount,
+        timeElapsed: "—",
         breakdown: [
-          { name: "Major Triad", correct: 3, total: 3 },
-          { name: "Minor Triad", correct: 2, total: 3 },
-          { name: "Maj7", correct: 2, total: 2 },
-          { name: "sus4", correct: 1, total: 2 },
+          { name: "Major Triad", correct: Math.min(doneCorrect, 3), total: Math.min(doneCount, 3) },
+          { name: "Minor Triad", correct: Math.min(Math.max(doneCorrect - 3, 0), 3), total: Math.min(Math.max(doneCount - 3, 0), 3) },
         ],
         insight:
-          "Your identification of tension intervals (sus4) remains consistent but slow. Focus on 4th-interval resolution patterns.",
+          doneCorrect / Math.max(doneCount, 1) >= 0.8
+            ? "Great precision! Keep up the consistency in future sessions."
+            : "Keep practising — focus on slow, deliberate listening before answering.",
       });
       router.push("/training/results");
+    },
+    [setSessionResult, router]
+  );
+
+  const handleNext = () => {
+    if (currentExercise >= config.count) {
+      pushResults(config.count, correctCount);
       return;
     }
-    // Reset for next exercise
     setCurrentExercise((n) => n + 1);
     setSlots(config.melodicSequence ? [null, null, null] : [null]);
     setIntervalStates({});
@@ -130,10 +138,21 @@ export default function ExerciseContainer() {
     setActiveStep(3);
   };
 
+  /**
+   * End session early.
+   * Only exercises that have been fully answered count toward the total.
+   * The current unanswered exercise does NOT count.
+   */
+  const handleEndSession = () => {
+    // How many exercises have been completed (answered)?
+    const doneCount = isAnswered ? currentExercise : currentExercise - 1;
+    pushResults(Math.max(doneCount, 0), correctCount);
+  };
+
   return (
     <div className="w-full">
-      {/* Context Banner & Progress */}
-      <section className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+      {/* Context Banner, Progress & End Session */}
+      <section className="flex flex-col md:flex-row md:items-start justify-between mb-8 gap-4">
         <div className="flex flex-col gap-1">
           <span className="font-headline text-[var(--color-primary)] uppercase tracking-widest text-xs font-bold">
             Context: {MOCK_CONTEXT_LABEL}
@@ -145,10 +164,39 @@ export default function ExerciseContainer() {
             {MOCK_CHORD_NAME}
           </p>
         </div>
-        <ExerciseProgressBar
-          current={currentExercise}
-          total={config.count}
-        />
+
+        <div className="flex flex-col items-end gap-3">
+          <ExerciseProgressBar
+            current={currentExercise}
+            total={config.count}
+          />
+          {/* End Session button */}
+          <button
+            type="button"
+            onClick={handleEndSession}
+            className="flex items-center gap-1.5 text-xs font-label font-bold uppercase tracking-widest transition-all px-3 py-1.5 rounded-lg"
+            style={{
+              color: "var(--color-error)",
+              border: `1px solid rgba(var(--rgb-error), 0.35)`,
+              background: `rgba(var(--rgb-error-container), 0.08)`,
+            }}
+            onMouseEnter={(e) => {
+              const btn = e.currentTarget as HTMLButtonElement;
+              btn.style.color = "var(--color-on-error)";
+              btn.style.borderColor = "transparent";
+              btn.style.background = "var(--color-error)";
+            }}
+            onMouseLeave={(e) => {
+              const btn = e.currentTarget as HTMLButtonElement;
+              btn.style.color = "var(--color-error)";
+              btn.style.borderColor = `rgba(var(--rgb-error), 0.35)`;
+              btn.style.background = `rgba(var(--rgb-error-container), 0.08)`;
+            }}
+          >
+            <span className="material-symbols-outlined text-[14px] leading-none">stop_circle</span>
+            End Session
+          </button>
+        </div>
       </section>
 
       {/* Step Indicator */}
