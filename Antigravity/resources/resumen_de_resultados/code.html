@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "outline": "#89919d",
+                    "on-tertiary": "#003824",
+                    "on-error": "#690005",
+                    "tertiary-fixed": "#6ffbbe",
+                    "on-primary-fixed": "#001d36",
+                    "inverse-surface": "#e5e2e1",
+                    "inverse-on-surface": "#313030",
+                    "secondary-fixed-dim": "#fbbc00",
+                    "on-background": "#e5e2e1",
+                    "surface-container-high": "#2a2a2a",
+                    "on-secondary": "#402d00",
+                    "tertiary-fixed-dim": "#4edea3",
+                    "secondary-fixed": "#ffdfa0",
+                    "on-surface": "#e5e2e1",
+                    "on-tertiary-fixed-variant": "#005236",
+                    "surface": "#131313",
+                    "surface-tint": "#9ecaff",
+                    "on-tertiary-container": "#003220",
+                    "on-tertiary-fixed": "#002113",
+                    "on-primary-container": "#002c4f",
+                    "on-secondary-container": "#6d5000",
+                    "primary-fixed": "#d1e4ff",
+                    "surface-container-low": "#1c1b1b",
+                    "secondary": "#ffe2ab",
+                    "on-primary-fixed-variant": "#00497d",
+                    "surface-variant": "#353535",
+                    "on-primary": "#003258",
+                    "error": "#ffb4ab",
+                    "tertiary-container": "#00a673",
+                    "on-error-container": "#ffdad6",
+                    "background": "#131313",
+                    "primary-fixed-dim": "#9ecaff",
+                    "tertiary": "#4edea3",
+                    "surface-dim": "#131313",
+                    "outline-variant": "#404752",
+                    "secondary-container": "#ffbf00",
+                    "surface-container-lowest": "#0e0e0e",
+                    "on-secondary-fixed": "#261a00",
+                    "surface-container": "#20201f",
+                    "surface-bright": "#393939",
+                    "inverse-primary": "#0061a4",
+                    "on-secondary-fixed-variant": "#5c4300",
+                    "primary": "#9ecaff",
+                    "on-surface-variant": "#bfc7d4",
+                    "primary-container": "#2196f3",
+                    "error-container": "#93000a",
+                    "surface-container-highest": "#353535"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Space Grotesk"],
+                    "body": ["Manrope"],
+                    "label": ["Manrope"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bloom-effect {
+            box-shadow: 0 0 20px rgba(255, 191, 0, 0.2);
+        }
+        .glass-panel {
+            background: rgba(53, 53, 53, 0.6);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="bg-[#131313] text-[#9ecaff] font-['Space_Grotesk'] tracking-tight uppercase font-bold docked full-width top-0 flex justify-between items-center px-6 h-16 w-full max-w-full z-50">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined cursor-pointer hover:bg-[#2a2a2a] transition-colors duration-300 p-2 rounded-lg">menu</span>
+<h1 class="text-lg tracking-[-0.02em] font-bold text-[#9ecaff]">THE ATELIER</h1>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant/30">
+<img alt="Technical Artisan Profile" data-alt="close-up portrait of a professional musician in a dimly lit studio with subtle blue rim lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuApbV9CgjK56BYnOtgLL8e7CwWWHRIpzJ0VMiDtLsR8gypVoyZtbAFcmRbelayioD1V3ebMfQPQeqAnrEuNad1aTtYKzmydi7qVUFxm1gA1BvwJvmPwpgIRjJK5Zb03KczMayr6t8hZGNv7xoEkV6JBkLO9FnxBBvxs_Q2bKJhhYj7-5ZgkjC3DtVdJ_fblR6L6fWwlDTGHNnoLSoRw6-GN0baRragat-Lxtg1PT7jJk-Y8k66sea9cCqfJ7aPDbxbPPBGhdaJgEfU"/>
+</div>
+</div>
+</header>
+<main class="flex-1 w-full max-w-5xl mx-auto px-6 pt-12 pb-24 md:pb-12">
+<!-- Header Section: Asymmetric Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16">
+<div class="lg:col-span-8">
+<p class="font-headline text-secondary tracking-widest uppercase text-sm mb-2">SESSION COMPLETE</p>
+<h2 class="font-headline text-5xl md:text-7xl font-bold tracking-tighter leading-none mb-6">Workshop Completed</h2>
+<div class="flex items-baseline gap-4">
+<span class="font-headline text-7xl font-bold text-primary">8/10</span>
+<span class="font-headline text-2xl text-on-surface-variant/60 uppercase">Correct</span>
+</div>
+</div>
+<div class="lg:col-span-4 flex flex-col justify-end">
+<div class="bg-surface-container-low p-6 rounded-xl border-l-4 border-primary">
+<p class="text-sm text-on-surface-variant mb-1">Time Elapsed</p>
+<p class="font-headline text-2xl font-bold text-on-surface">12:44.02</p>
+</div>
+</div>
+</div>
+<!-- Bento Grid Analysis -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+<!-- Overall Performance Chart (Radial Simulation) -->
+<div class="md:col-span-1 bg-surface-container-low p-8 rounded-xl flex flex-col items-center justify-center relative overflow-hidden">
+<div class="absolute top-0 right-0 p-4 opacity-10">
+<span class="material-symbols-outlined text-8xl" style="font-variation-settings: 'FILL' 1;">analytics</span>
+</div>
+<div class="relative w-40 h-40 flex items-center justify-center">
+<!-- SVG Progress Circle -->
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-surface-variant" cx="80" cy="80" fill="transparent" r="70" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-primary" cx="80" cy="80" fill="transparent" r="70" stroke="currentColor" stroke-dasharray="440" stroke-dashoffset="88" stroke-width="8"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="font-headline text-4xl font-bold">80%</span>
+<span class="text-[10px] uppercase tracking-widest text-on-surface-variant">Accuracy</span>
+</div>
+</div>
+<p class="mt-6 text-center text-sm font-medium text-on-surface-variant">High precision maintained in Harmonic Dictation.</p>
+</div>
+<!-- Breakdown List -->
+<div class="md:col-span-2 bg-surface-container-low rounded-xl overflow-hidden">
+<div class="p-6 border-b border-outline-variant/10 flex justify-between items-center">
+<h3 class="font-headline text-lg font-bold uppercase tracking-tight">Technical Breakdown</h3>
+<span class="text-xs font-label text-on-surface-variant/60">4 PARAMETERS EVALUATED</span>
+</div>
+<div class="divide-y divide-outline-variant/5">
+<!-- Major Triad -->
+<div class="p-6 flex items-center justify-between group hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-2 h-10 bg-tertiary rounded-full"></div>
+<div>
+<h4 class="font-headline text-base font-bold">Major Triad</h4>
+<p class="text-xs text-on-surface-variant uppercase">Perfect Stability</p>
+</div>
+</div>
+<div class="text-right">
+<span class="font-headline text-xl font-bold text-tertiary">3/3</span>
+<div class="w-24 h-1 bg-surface-variant mt-2 rounded-full overflow-hidden">
+<div class="bg-tertiary h-full w-full"></div>
+</div>
+</div>
+</div>
+<!-- Minor Triad -->
+<div class="p-6 flex items-center justify-between group hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-2 h-10 bg-error rounded-full"></div>
+<div>
+<h4 class="font-headline text-base font-bold">Minor Triad</h4>
+<p class="text-xs text-on-surface-variant uppercase">Needs Interval Focus</p>
+</div>
+</div>
+<div class="text-right">
+<span class="font-headline text-xl font-bold text-error">2/3</span>
+<div class="w-24 h-1 bg-surface-variant mt-2 rounded-full overflow-hidden">
+<div class="bg-error h-full w-[66%]"></div>
+</div>
+</div>
+</div>
+<!-- Maj7 -->
+<div class="p-6 flex items-center justify-between group hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-2 h-10 bg-tertiary rounded-full"></div>
+<div>
+<h4 class="font-headline text-base font-bold">Maj7</h4>
+<p class="text-xs text-on-surface-variant uppercase">Technical Mastery</p>
+</div>
+</div>
+<div class="text-right">
+<span class="font-headline text-xl font-bold text-tertiary">2/2</span>
+<div class="w-24 h-1 bg-surface-variant mt-2 rounded-full overflow-hidden">
+<div class="bg-tertiary h-full w-full"></div>
+</div>
+</div>
+</div>
+<!-- sus4 -->
+<div class="p-6 flex items-center justify-between group hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-2 h-10 bg-secondary rounded-full"></div>
+<div>
+<h4 class="font-headline text-base font-bold">sus4</h4>
+<p class="text-xs text-on-surface-variant uppercase">Neutral Performance</p>
+</div>
+</div>
+<div class="text-right">
+<span class="font-headline text-xl font-bold text-secondary">1/2</span>
+<div class="w-24 h-1 bg-surface-variant mt-2 rounded-full overflow-hidden">
+<div class="bg-secondary h-full w-[50%]"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Growth Insight -->
+<div class="bg-surface-container-high rounded-xl p-8 mb-12 flex flex-col md:flex-row items-center gap-8 border-l-4 border-secondary">
+<div class="flex-1">
+<h3 class="font-headline text-2xl font-bold mb-2">Technical Insight</h3>
+<p class="text-on-surface-variant leading-relaxed">Your identification of <span class="text-secondary font-bold">tension intervals</span> (sus4) remains consistent but slow. Focus your next daily drill on 4th-interval resolution patterns to decrease identification time by an estimated 15%.</p>
+</div>
+<div class="shrink-0 w-full md:w-auto">
+<button class="w-full md:w-auto px-8 py-4 bg-surface-container-highest text-on-surface font-headline font-bold uppercase tracking-widest rounded-md hover:bg-surface-bright transition-all border border-outline-variant/20 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">auto_graph</span>
+                    View Full History
+                </button>
+</div>
+</div>
+<!-- Action Area -->
+<div class="flex flex-col md:flex-row gap-4 justify-center items-center">
+<button class="group relative w-full md:w-64 px-10 py-5 bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed font-headline font-black uppercase tracking-widest rounded-md overflow-hidden transition-all active:scale-95 shadow-lg">
+<span class="relative z-10 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">refresh</span>
+                    Retake Exercises
+                </span>
+<div class="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+</button>
+<button class="w-full md:w-64 px-10 py-5 bg-transparent border border-outline-variant text-on-surface font-headline font-bold uppercase tracking-widest rounded-md hover:bg-surface-container-highest transition-all active:scale-95 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">settings</span>
+                Back to Settings
+            </button>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-20 pb-safe px-4 bg-[#131313]/90 backdrop-blur-xl border-t border-[#404752]/15 shadow-[0_-8px_32px_rgba(0,97,164,0.08)] rounded-t-xl md:hidden">
+<a class="flex flex-col items-center justify-center text-[#353535] hover:text-[#9ecaff] transition-all" href="#">
+<span class="material-symbols-outlined">music_note</span>
+<span class="font-['Manrope'] text-[10px] font-semibold tracking-wider">Training</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#353535] hover:text-[#9ecaff] transition-all" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="font-['Manrope'] text-[10px] font-semibold tracking-wider">Library</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#ffe2ab] scale-110" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">analytics</span>
+<span class="font-['Manrope'] text-[10px] font-semibold tracking-wider">Stats</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#353535] hover:text-[#9ecaff] transition-all" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-['Manrope'] text-[10px] font-semibold tracking-wider">Profile</span>
+</a>
+</nav>
+<!-- Decorative Fretboard Element (Subtle BG) -->
+<div class="fixed bottom-0 right-0 w-1/3 h-2/3 pointer-events-none opacity-5 overflow-hidden hidden lg:block">
+<div class="flex h-full gap-4">
+<div class="w-1 bg-surface-bright/50"></div>
+<div class="w-1 bg-surface-bright/50"></div>
+<div class="w-1 bg-surface-bright/50"></div>
+<div class="w-1 bg-surface-bright/50"></div>
+<div class="w-1 bg-surface-bright/50"></div>
+<div class="w-1 bg-surface-bright/50"></div>
+</div>
+</div>
+</body></html>
