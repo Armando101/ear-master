@@ -73,6 +73,45 @@
 }
 
 /* ================================================
+   Raw RGB channel values — for rgba() compositions
+   ================================================ */
+:root {
+  /* Surface channels */
+  --rgb-background:                19, 19, 19;
+  --rgb-surface-container-lowest:  14, 14, 14;
+  --rgb-surface-container-low:     28, 27, 27;
+  --rgb-surface-container:         32, 32, 31;
+  --rgb-surface-container-high:    42, 42, 42;
+  --rgb-surface-container-highest: 53, 53, 53;
+  --rgb-surface-variant:           53, 53, 53;
+  --rgb-surface-bright:            57, 57, 57;
+
+  /* Primary channels */
+  --rgb-primary:                   158, 202, 255;
+  --rgb-primary-container:         33, 150, 243;
+  --rgb-inverse-primary:           0, 97, 164;
+
+  /* Secondary channels */
+  --rgb-secondary:                 255, 226, 171;
+  --rgb-secondary-container:       255, 191, 0;
+  --rgb-on-secondary-fixed:        38, 26, 0;
+
+  /* Tertiary / success channels */
+  --rgb-tertiary:                  78, 222, 163;
+  --rgb-tertiary-container:        0, 166, 115;
+
+  /* Error channels */
+  --rgb-error:                     255, 180, 171;
+  --rgb-error-container:           147, 0, 10;
+
+  /* Outline channels */
+  --rgb-outline-variant:           64, 71, 82;
+
+  /* Pure black */
+  --rgb-black:                     0, 0, 0;
+}
+
+/* ================================================
    Global resets & base styles
    ================================================ */
 *, *::before, *::after {
@@ -106,40 +145,40 @@ body {
 
 /* Gradient CTA button soul */
 .cta-gradient {
-  background: linear-gradient(135deg, #9ecaff 0%, #2196f3 100%);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-container) 100%);
 }
 
 /* Glassmorphism panels */
 .glass-panel {
-  background: rgba(53, 53, 53, 0.6);
+  background: rgba(var(--rgb-surface-variant), 0.6);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
 
 /* Bloom / amber glow effect for selected notes */
 .bloom-effect {
-  box-shadow: 0 0 20px rgba(255, 191, 0, 0.2);
+  box-shadow: 0 0 20px rgba(var(--rgb-secondary-container), 0.2);
 }
 
 /* Primary glow — for focus states */
 .primary-glow {
-  box-shadow: 0 0 0 2px rgba(158, 202, 255, 0.4);
+  box-shadow: 0 0 0 2px rgba(var(--rgb-primary), 0.4);
 }
 
 /* Recessed input look */
 .recessed-input {
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+  box-shadow: inset 0 2px 4px rgba(var(--rgb-black), 0.4);
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar       { width: 4px; }
-::-webkit-scrollbar-track { background: #131313; }
-::-webkit-scrollbar-thumb { background: #353535; border-radius: 10px; }
+::-webkit-scrollbar-track { background: var(--color-background); }
+::-webkit-scrollbar-thumb { background: var(--color-surface-variant); border-radius: 10px; }
 
 /* Active chip (selected chord filter) */
 .chip-active {
-  background-color: #ffbf00;
-  color: #261a00;
+  background-color: var(--color-secondary-container);
+  color: var(--color-on-secondary-fixed);
 }
 
 /* ================================================
@@ -152,7 +191,7 @@ body {
   z-index: -10;
   width: 33%;
   height: 100%;
-  background: linear-gradient(to left, rgba(158,202,255,0.05), transparent);
+  background: linear-gradient(to left, rgba(var(--rgb-primary), 0.05), transparent);
   pointer-events: none;
 }
 
@@ -163,7 +202,7 @@ body {
   z-index: -10;
   width: 16rem;
   height: 16rem;
-  background: rgba(255, 191, 0, 0.05);
+  background: rgba(var(--rgb-secondary-container), 0.05);
   border-radius: 50%;
   filter: blur(120px);
   pointer-events: none;

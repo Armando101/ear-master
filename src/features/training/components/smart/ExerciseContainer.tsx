@@ -46,6 +46,7 @@ export default function ExerciseContainer() {
       particleCount: 120,
       spread: 80,
       origin: { y: 0.65 },
+      // Use raw hex values here — canvas-confetti does not support CSS variables
       colors: ["#9ecaff", "#4edea3", "#ffe2ab", "#ffbf00"],
     });
   }, []);
@@ -134,13 +135,13 @@ export default function ExerciseContainer() {
       {/* Context Banner & Progress */}
       <section className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
         <div className="flex flex-col gap-1">
-          <span className="font-headline text-[#9ecaff] uppercase tracking-widest text-xs font-bold">
+          <span className="font-headline text-[var(--color-primary)] uppercase tracking-widest text-xs font-bold">
             Context: {MOCK_CONTEXT_LABEL}
           </span>
-          <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tighter text-[#e5e2e1]">
+          <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tighter text-[var(--color-on-surface)]">
             {config.melodicSequence ? "Melodic Sequence" : "Single Note"}
           </h1>
-          <p className="font-headline text-lg font-medium text-[#bfc7d4] mt-1">
+          <p className="font-headline text-lg font-medium text-[var(--color-on-surface-variant)] mt-1">
             {MOCK_CHORD_NAME}
           </p>
         </div>
@@ -168,12 +169,14 @@ export default function ExerciseContainer() {
             className="w-full max-w-lg rounded-xl px-6 py-4 mb-6 text-center font-headline font-bold text-lg transition-all duration-300"
             style={{
               background: feedbackCorrect
-                ? "rgba(0,166,115,0.15)"
-                : "rgba(147,0,10,0.15)",
+                ? `rgba(var(--rgb-tertiary-container), 0.15)`
+                : `rgba(var(--rgb-error-container), 0.15)`,
               border: feedbackCorrect
-                ? "1px solid rgba(78,222,163,0.3)"
-                : "1px solid rgba(255,180,171,0.3)",
-              color: feedbackCorrect ? "#4edea3" : "#ffb4ab",
+                ? `1px solid rgba(var(--rgb-tertiary), 0.3)`
+                : `1px solid rgba(var(--rgb-error), 0.3)`,
+              color: feedbackCorrect
+                ? "var(--color-tertiary)"
+                : "var(--color-error)",
             }}
           >
             {feedbackCorrect ? (
@@ -213,9 +216,9 @@ export default function ExerciseContainer() {
             onClick={handleNext}
             className="px-12 py-4 rounded-xl font-headline font-black text-base uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-95"
             style={{
-              background: "linear-gradient(135deg, #9ecaff 0%, #2196f3 100%)",
-              color: "#003258",
-              boxShadow: "0 8px 32px rgba(33,150,243,0.25)",
+              background: "linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-container) 100%)",
+              color: "var(--color-on-primary)",
+              boxShadow: `0 8px 32px rgba(var(--rgb-primary-container), 0.25)`,
             }}
           >
             {currentExercise >= config.count ? "See Results" : "Next Exercise"}{" "}

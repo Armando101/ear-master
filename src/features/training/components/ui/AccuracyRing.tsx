@@ -21,7 +21,7 @@ export default function AccuracyRing({ percentage }: AccuracyRingProps) {
           cy="80"
           r={radius}
           fill="transparent"
-          stroke="#353535"
+          stroke="var(--color-surface-variant)"
           strokeWidth="8"
         />
         {/* Progress */}
@@ -30,7 +30,7 @@ export default function AccuracyRing({ percentage }: AccuracyRingProps) {
           cy="80"
           r={radius}
           fill="transparent"
-          stroke="#9ecaff"
+          stroke="var(--color-primary)"
           strokeWidth="8"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
@@ -40,10 +40,10 @@ export default function AccuracyRing({ percentage }: AccuracyRingProps) {
       </svg>
       {/* Center label */}
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="font-headline text-4xl font-bold text-[#e5e2e1]">
+        <span className="font-headline text-4xl font-bold text-[var(--color-on-surface)]">
           {percentage}%
         </span>
-        <span className="text-[10px] uppercase tracking-widest text-[#bfc7d4]">
+        <span className="text-[10px] uppercase tracking-widest text-[var(--color-on-surface-variant)]">
           Accuracy
         </span>
       </div>

@@ -44,17 +44,17 @@ export default function ResultsContainer() {
       {/* Asymmetric header */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16">
         <div className="lg:col-span-8">
-          <p className="font-headline text-[#ffe2ab] tracking-widest uppercase text-sm mb-2">
+          <p className="font-headline text-[var(--color-secondary)] tracking-widest uppercase text-sm mb-2">
             Session Complete
           </p>
-          <h1 className="font-headline text-5xl md:text-7xl font-bold tracking-tighter leading-none mb-6 text-[#e5e2e1]">
+          <h1 className="font-headline text-5xl md:text-7xl font-bold tracking-tighter leading-none mb-6 text-[var(--color-on-surface)]">
             Workshop Completed
           </h1>
           <div className="flex items-baseline gap-4">
-            <span className="font-headline text-7xl font-bold text-[#9ecaff]">
+            <span className="font-headline text-7xl font-bold text-[var(--color-primary)]">
               {result.correct}/{result.total}
             </span>
-            <span className="font-headline text-2xl text-[#bfc7d4]/60 uppercase">
+            <span className="font-headline text-2xl text-[var(--color-on-surface-variant)]/60 uppercase">
               Correct
             </span>
           </div>
@@ -65,12 +65,12 @@ export default function ResultsContainer() {
           <div
             className="p-6 rounded-xl"
             style={{
-              background: "#1c1b1b",
-              borderLeft: "4px solid #9ecaff",
+              background: "var(--color-surface-container-low)",
+              borderLeft: "4px solid var(--color-primary)",
             }}
           >
-            <p className="text-sm text-[#bfc7d4] mb-1">Time Elapsed</p>
-            <p className="font-headline text-2xl font-bold text-[#e5e2e1]">
+            <p className="text-sm text-[var(--color-on-surface-variant)] mb-1">Time Elapsed</p>
+            <p className="font-headline text-2xl font-bold text-[var(--color-on-surface)]">
               {result.timeElapsed}
             </p>
           </div>
@@ -82,7 +82,7 @@ export default function ResultsContainer() {
         {/* Accuracy ring */}
         <div
           className="md:col-span-1 p-8 rounded-xl flex flex-col items-center justify-center relative overflow-hidden"
-          style={{ background: "#1c1b1b" }}
+          style={{ background: "var(--color-surface-container-low)" }}
         >
           <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
             <span
@@ -93,7 +93,7 @@ export default function ResultsContainer() {
             </span>
           </div>
           <AccuracyRing percentage={percentage} />
-          <p className="mt-6 text-center text-sm font-medium text-[#bfc7d4]">
+          <p className="mt-6 text-center text-sm font-medium text-[var(--color-on-surface-variant)]">
             {percentage >= 80
               ? "High precision maintained."
               : "Keep practising to improve accuracy."}
@@ -103,16 +103,16 @@ export default function ResultsContainer() {
         {/* Breakdown list */}
         <div
           className="md:col-span-2 rounded-xl overflow-hidden"
-          style={{ background: "#1c1b1b" }}
+          style={{ background: "var(--color-surface-container-low)" }}
         >
           <div
             className="p-6 flex justify-between items-center"
-            style={{ borderBottom: "1px solid rgba(64,71,82,0.1)" }}
+            style={{ borderBottom: `1px solid rgba(var(--rgb-outline-variant), 0.1)` }}
           >
-            <h3 className="font-headline text-lg font-bold uppercase tracking-tight text-[#e5e2e1]">
+            <h3 className="font-headline text-lg font-bold uppercase tracking-tight text-[var(--color-on-surface)]">
               Technical Breakdown
             </h3>
-            <span className="text-xs font-label text-[#bfc7d4]/60">
+            <span className="text-xs font-label text-[var(--color-on-surface-variant)]/60">
               {result.breakdown.length} PARAMETERS
             </span>
           </div>
@@ -137,7 +137,11 @@ export default function ResultsContainer() {
       <div className="fixed bottom-0 right-0 w-1/3 h-2/3 pointer-events-none opacity-5 overflow-hidden hidden lg:block">
         <div className="flex h-full gap-6">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="w-px bg-[#393939]/50 h-full" />
+            <div
+              key={i}
+              className="w-px h-full"
+              style={{ background: "var(--color-surface-bright)" }}
+            />
           ))}
         </div>
       </div>

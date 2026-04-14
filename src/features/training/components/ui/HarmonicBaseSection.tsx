@@ -20,9 +20,9 @@ export default function HarmonicBaseSection({
   onSelectAllTetrads,
 }: HarmonicBaseSectionProps) {
   return (
-    <div className="bg-[#1c1b1b] p-8 rounded-xl">
+    <div className="bg-[var(--color-surface-container-low)] p-8 rounded-xl">
       <h3 className="font-headline text-xl font-bold mb-6 flex items-center gap-3">
-        <span className="material-symbols-outlined text-[#ffe2ab]">layers</span>
+        <span className="material-symbols-outlined text-[var(--color-secondary)]">layers</span>
         Harmonic Base
       </h3>
 
@@ -30,13 +30,13 @@ export default function HarmonicBaseSection({
         {/* Triads */}
         <div>
           <div className="flex justify-between items-end mb-4">
-            <label className="font-label text-xs uppercase tracking-widest text-[#89919d]">
+            <label className="font-label text-xs uppercase tracking-widest text-[var(--color-outline)]">
               Triads to practice
             </label>
             <button
               type="button"
               onClick={onSelectAllTriads}
-              className="text-xs text-[#9ecaff] font-bold hover:underline"
+              className="text-xs text-[var(--color-primary)] font-bold hover:underline"
             >
               Select All
             </button>
@@ -56,13 +56,13 @@ export default function HarmonicBaseSection({
         {/* Tetrads */}
         <div>
           <div className="flex justify-between items-end mb-4">
-            <label className="font-label text-xs uppercase tracking-widest text-[#89919d]">
+            <label className="font-label text-xs uppercase tracking-widest text-[var(--color-outline)]">
               Tetrads to practice
             </label>
             <button
               type="button"
               onClick={onSelectAllTetrads}
-              className="text-xs text-[#9ecaff] font-bold hover:underline"
+              className="text-xs text-[var(--color-primary)] font-bold hover:underline"
             >
               Select All
             </button>

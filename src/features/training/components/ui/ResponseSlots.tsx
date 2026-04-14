@@ -17,11 +17,11 @@ export default function ResponseSlots({ slots, onClearLast }: ResponseSlotsProps
             key={i}
             className="w-20 h-24 md:w-24 md:h-28 rounded-xl flex items-center justify-center font-headline text-2xl font-bold transition-all duration-200 recessed-input"
             style={{
-              background: "#0e0e0e",
+              background: "var(--color-surface-container-lowest)",
               border: slot
-                ? "2px solid rgba(255,191,0,0.4)"
-                : "2px dashed rgba(64,71,82,0.3)",
-              color: slot ? "#ffe2ab" : "#353535",
+                ? `2px solid rgba(var(--rgb-secondary-container), 0.4)`
+                : `2px dashed rgba(var(--rgb-outline-variant), 0.3)`,
+              color: slot ? "var(--color-secondary)" : "var(--color-surface-variant)",
             }}
           >
             {slot ?? "?"}
@@ -33,7 +33,7 @@ export default function ResponseSlots({ slots, onClearLast }: ResponseSlotsProps
           type="button"
           onClick={onClearLast}
           disabled={filled === 0}
-          className="flex items-center justify-center w-12 h-24 md:h-28 rounded-xl bg-[#2a2a2a] text-[#bfc7d4] hover:text-[#ffb4ab] hover:bg-[#353535] transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+          className="flex items-center justify-center w-12 h-24 md:h-28 rounded-xl bg-[var(--color-surface-container-high)] text-[var(--color-on-surface-variant)] hover:text-[var(--color-error)] hover:bg-[var(--color-surface-variant)] transition-all disabled:opacity-30 disabled:cursor-not-allowed"
           aria-label="Clear last answer"
         >
           <span className="material-symbols-outlined">backspace</span>

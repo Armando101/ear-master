@@ -11,16 +11,16 @@ export default function ExerciseProgressBar({
 
   return (
     <div className="flex flex-col items-end gap-2">
-      <span className="font-headline text-[#bfc7d4] text-sm uppercase tracking-wider">
+      <span className="font-headline text-[var(--color-on-surface-variant)] text-sm uppercase tracking-wider">
         Exercise {current} of {total}
       </span>
       <div
         className="w-48 h-1 rounded-full overflow-hidden"
-        style={{ background: "#2a2a2a" }}
+        style={{ background: "var(--color-surface-container-high)" }}
       >
         <div
           className="h-full rounded-full transition-all duration-500"
-          style={{ width: `${percentage}%`, background: "#9ecaff" }}
+          style={{ width: `${percentage}%`, background: "var(--color-primary)" }}
         />
       </div>
     </div>

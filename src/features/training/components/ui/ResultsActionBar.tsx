@@ -15,9 +15,9 @@ export default function ResultsActionBar({
         onClick={onRetake}
         className="group relative w-full md:w-64 px-10 py-5 rounded-md font-headline font-black uppercase tracking-widest overflow-hidden transition-all active:scale-95"
         style={{
-          background: "linear-gradient(135deg, #9ecaff 0%, #2196f3 100%)",
-          color: "#001d36",
-          boxShadow: "0 8px 24px rgba(33,150,243,0.2)",
+          background: "linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-container) 100%)",
+          color: "var(--color-on-primary-fixed)",
+          boxShadow: `0 8px 24px rgba(var(--rgb-primary-container), 0.2)`,
         }}
       >
         <span className="relative z-10 flex items-center justify-center gap-2">
@@ -31,10 +31,10 @@ export default function ResultsActionBar({
       <button
         type="button"
         onClick={onBackToSettings}
-        className="w-full md:w-64 px-10 py-5 rounded-md font-headline font-bold uppercase tracking-widest text-[#e5e2e1] transition-all active:scale-95 flex items-center justify-center gap-2 hover:bg-[#353535]"
+        className="w-full md:w-64 px-10 py-5 rounded-md font-headline font-bold uppercase tracking-widest text-[var(--color-on-surface)] transition-all active:scale-95 flex items-center justify-center gap-2 hover:bg-[var(--color-surface-variant)]"
         style={{
           background: "transparent",
-          border: "1px solid #404752",
+          border: `1px solid var(--color-outline-variant)`,
         }}
       >
         <span className="material-symbols-outlined">settings</span>

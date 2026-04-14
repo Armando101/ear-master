@@ -31,10 +31,10 @@ export default function WorkshopConfigContainer() {
     <div className="w-full">
       {/* Header */}
       <div className="w-full mb-10">
-        <p className="font-headline text-[#9ecaff] text-sm tracking-[0.2em] uppercase mb-2">
+        <p className="font-headline text-[var(--color-primary)] text-sm tracking-[0.2em] uppercase mb-2">
           Technical Drill
         </p>
-        <h1 className="font-headline text-4xl md:text-6xl font-bold tracking-tight text-[#e5e2e1]">
+        <h1 className="font-headline text-4xl md:text-6xl font-bold tracking-tight text-[var(--color-on-surface)]">
           Workshop Configuration
         </h1>
       </div>

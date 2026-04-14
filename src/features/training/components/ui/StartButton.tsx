@@ -12,12 +12,12 @@ export default function StartButton({ onClick, disabled = false }: StartButtonPr
       className="group w-full py-6 rounded-xl font-headline text-xl font-black tracking-widest uppercase flex items-center justify-center gap-4 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
       style={{
         background: disabled
-          ? "#353535"
-          : "linear-gradient(135deg, #9ecaff 0%, #2196f3 100%)",
-        color: "#003258",
+          ? "var(--color-surface-variant)"
+          : "linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-container) 100%)",
+        color: "var(--color-on-primary)",
         boxShadow: disabled
           ? "none"
-          : "0 8px 32px rgba(33,150,243,0.25)",
+          : `0 8px 32px rgba(var(--rgb-primary-container), 0.25)`,
       }}
     >
       START WORKSHOP

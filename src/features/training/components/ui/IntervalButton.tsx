@@ -11,16 +11,16 @@ interface IntervalButtonProps {
 const STATE_STYLES: Record<IntervalState, { container: string; text: string }> = {
   default: {
     container:
-      "bg-[#353535] border border-[#404752]/10 hover:border-[#9ecaff]/50 hover:bg-[#393939] group",
-    text: "text-[#e5e2e1] group-hover:text-[#9ecaff]",
+      "bg-[var(--color-surface-variant)] border border-[var(--color-outline-variant)]/10 hover:border-[var(--color-primary)]/50 hover:bg-[var(--color-surface-bright)] group",
+    text: "text-[var(--color-on-surface)] group-hover:text-[var(--color-primary)]",
   },
   correct: {
-    container: "bg-[#00a673]/20 border border-[#4edea3]/40",
-    text: "text-[#4edea3]",
+    container: "bg-[var(--color-tertiary-container)]/20 border border-[var(--color-tertiary)]/40",
+    text: "text-[var(--color-tertiary)]",
   },
   incorrect: {
-    container: "bg-[#93000a]/20 border border-[#ffb4ab]/40",
-    text: "text-[#ffb4ab]",
+    container: "bg-[var(--color-error-container)]/20 border border-[var(--color-error)]/40",
+    text: "text-[var(--color-error)]",
   },
 };
 
@@ -43,7 +43,7 @@ export default function IntervalButton({
       <span className={`font-headline text-2xl font-bold transition-colors ${text}`}>
         {symbol}
       </span>
-      <span className="font-label text-[10px] text-[#bfc7d4] uppercase tracking-tighter mt-0.5">
+      <span className="font-label text-[10px] text-[var(--color-on-surface-variant)] uppercase tracking-tighter mt-0.5">
         {name}
       </span>
     </button>

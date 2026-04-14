@@ -26,32 +26,41 @@ export default function StepIndicator({ activeStep }: StepIndicatorProps) {
               isFirst ? "rounded-l-xl" : ""
             } ${isLast ? "rounded-r-xl" : ""} ${
               isActive
-                ? "bg-[#2a2a2a] ring-2 ring-[#ffbf00]/20"
-                : "bg-[#1c1b1b] opacity-50"
+                ? "bg-[var(--color-surface-container-high)]"
+                : "bg-[var(--color-surface-container-low)] opacity-50"
             }`}
-            style={!isLast ? { borderRight: "1px solid #131313" } : undefined}
+            style={{
+              ...(isActive
+                ? { boxShadow: `0 0 0 2px rgba(var(--rgb-secondary-container), 0.2)` }
+                : {}),
+              ...(!isLast
+                ? { borderRight: `1px solid var(--color-background)` }
+                : {}),
+            }}
           >
             {isActive && (
-              <div className="absolute -top-3 left-4 bg-[#ffbf00] text-[#261a00] px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-tighter">
+              <div className="absolute -top-3 left-4 bg-[var(--color-secondary-container)] text-[var(--color-on-secondary-fixed)] px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-tighter">
                 Active
               </div>
             )}
             <span
               className={`font-headline text-[10px] uppercase tracking-widest ${
-                isActive ? "text-[#ffe2ab]" : "text-[#bfc7d4]"
+                isActive ? "text-[var(--color-secondary)]" : "text-[var(--color-on-surface-variant)]"
               }`}
             >
               Step {id}
             </span>
             <span
               className={`font-headline font-black uppercase tracking-tight ${
-                isActive ? "text-[#ffe2ab] text-lg" : "text-[#e5e2e1] text-sm"
+                isActive
+                  ? "text-[var(--color-secondary)] text-lg"
+                  : "text-[var(--color-on-surface)] text-sm"
               }`}
             >
               {label}
             </span>
             {isDone && (
-              <span className="material-symbols-outlined text-[#4edea3] text-[14px]">
+              <span className="material-symbols-outlined text-[var(--color-tertiary)] text-[14px]">
                 check_circle
               </span>
             )}

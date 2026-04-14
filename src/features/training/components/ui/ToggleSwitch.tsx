@@ -12,11 +12,14 @@ export default function ToggleSwitch({ checked, onChange, id }: ToggleSwitchProp
       id={id}
       aria-checked={checked}
       onClick={onChange}
-      className="relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#9ecaff]/60"
+      className="relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-300 focus:outline-none"
       style={{
         background: checked
-          ? "linear-gradient(135deg, #9ecaff 0%, #2196f3 100%)"
-          : "#353535",
+          ? "linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-container) 100%)"
+          : "var(--color-surface-variant)",
+        boxShadow: checked
+          ? `0 0 0 2px rgba(var(--rgb-primary), 0.6)`
+          : "none",
       }}
     >
       <span

@@ -18,11 +18,11 @@ export default function BottomNavBar() {
       aria-label="Main navigation"
       className="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-20 px-4"
       style={{
-        background: "rgba(19,19,19,0.92)",
+        background: `rgba(var(--rgb-background), 0.92)`,
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
-        borderTop: "1px solid rgba(64,71,82,0.15)",
-        boxShadow: "0 -8px 32px rgba(0,97,164,0.08)",
+        borderTop: `1px solid rgba(var(--rgb-outline-variant), 0.15)`,
+        boxShadow: `0 -8px 32px rgba(var(--rgb-inverse-primary), 0.08)`,
       }}
     >
       {NAV_ITEMS.map(({ href, icon, label }) => {
@@ -32,7 +32,7 @@ export default function BottomNavBar() {
             key={href}
             href={href}
             className="flex flex-col items-center justify-center gap-0.5 transition-all"
-            style={{ color: isActive ? "#ffe2ab" : "#353535" }}
+            style={{ color: isActive ? "var(--color-secondary)" : "var(--color-surface-variant)" }}
           >
             <span
               className="material-symbols-outlined text-[22px]"
