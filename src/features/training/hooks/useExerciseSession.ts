@@ -44,6 +44,28 @@ function buildEmptySlots(count: number): (IntervalSymbol | null)[] {
   return Array<IntervalSymbol | null>(count).fill(null);
 }
 
+/**
+ * Computes every audio URL that a question will need and preloads them all
+ * into the AudioService cache in one shot.
+ *
+ * Called immediately after a question is generated — while the user is still
+ * listening to the previous exercise's context — so the files are fully
+ * buffered by the time playback is actually requested.
+ */
+function preloadQuestion(q: ExerciseQuestion): void {
+  const urls: string[] = [
+    // 1. The context (cadence + arpeggio)
+    audioService.contextUrl(q.chord.root, q.chord.quality),
+    // 2. Every note in the sequence
+    ...q.targetIntervals.map((interval) => {
+      const semitones = intervalToSemitones(interval);
+      const pitch: PitchClass = transposePitch(q.chord.root, semitones);
+      return audioService.noteUrl(pitch);
+    }),
+  ];
+  audioService.preload(urls);
+}
+
 // ---------------------------------------------------------------------------
 // Hook
 // ---------------------------------------------------------------------------
@@ -54,6 +76,16 @@ export function useExerciseSession(): ExerciseSessionState & ExerciseSessionActi
 
   // We use a ref to track the initial question generation across StrictMode double-mount
   const initializedRef = useRef(false);
+
+  // Analytics tracking
+  const startTimeRef = useRef<number>(0);
+  const statsRef = useRef<{
+    major: { total: number; correct: number };
+    minor: { total: number; correct: number };
+  }>({
+    major: { total: 0, correct: 0 },
+    minor: { total: 0, correct: 0 },
+  });
 
   const [currentExercise, setCurrentExercise] = useState(1);
   const [correctCount, setCorrectCount] = useState(0);
@@ -102,6 +134,9 @@ export function useExerciseSession(): ExerciseSessionState & ExerciseSessionActi
 
   const startNewQuestion = useCallback(
     (q: ExerciseQuestion) => {
+      // Kick off preloading immediately so files are cached before playback
+      preloadQuestion(q);
+
       const slotCount = config.melodicSequence ? q.targetIntervals.length : 1;
       setQuestion(q);
       setSlots(buildEmptySlots(slotCount));
@@ -118,6 +153,7 @@ export function useExerciseSession(): ExerciseSessionState & ExerciseSessionActi
   useEffect(() => {
     if (initializedRef.current) return;
     initializedRef.current = true;
+    startTimeRef.current = Date.now();
     const q = generateQuestion(config);
     startNewQuestion(q);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -137,20 +173,27 @@ export function useExerciseSession(): ExerciseSessionState & ExerciseSessionActi
   }, []);
 
   const checkAnswer = useCallback(
-    (filledSlots: (IntervalSymbol | null)[], targetIntervals: IntervalSymbol[]) => {
+    (filledSlots: (IntervalSymbol | null)[], q: ExerciseQuestion) => {
       const answer = filledSlots.filter(Boolean) as IntervalSymbol[];
       const isCorrect =
-        answer.length === targetIntervals.length &&
-        answer.every((v, i) => v === targetIntervals[i]);
+        answer.length === q.targetIntervals.length &&
+        answer.every((v, i) => v === q.targetIntervals[i]);
 
       const newStates: Partial<Record<IntervalSymbol, IntervalState>> = {};
       answer.forEach((sym, i) => {
-        newStates[sym] = sym === targetIntervals[i] ? "correct" : "incorrect";
+        newStates[sym] = sym === q.targetIntervals[i] ? "correct" : "incorrect";
       });
 
       setIntervalStates(newStates);
       setIsAnswered(true);
       setFeedbackCorrect(isCorrect);
+
+      // Record stats for this chord quality
+      if (q.chord.quality === "major" || q.chord.quality === "minor") {
+        statsRef.current[q.chord.quality].total++;
+        if (isCorrect) statsRef.current[q.chord.quality].correct++;
+      }
+
       if (isCorrect) {
         setCorrectCount((n) => n + 1);
         fireConfetti();
@@ -166,7 +209,7 @@ export function useExerciseSession(): ExerciseSessionState & ExerciseSessionActi
 
   useEffect(() => {
     if (allFilled && !isAnswered && question) {
-      checkAnswer(currentSlots, question.targetIntervals);
+      checkAnswer(currentSlots, question);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allFilled]);
@@ -177,12 +220,28 @@ export function useExerciseSession(): ExerciseSessionState & ExerciseSessionActi
 
   const pushResults = useCallback(
     (doneCount: number, doneCorrect: number) => {
-      // Build breakdown per chord quality actually encountered
+      // Calculate elapsed time
+      const elapsedMs = Date.now() - startTimeRef.current;
+      const totalSeconds = Math.floor(elapsedMs / 1000);
+      const m = Math.floor(totalSeconds / 60);
+      const s = totalSeconds % 60;
+      const formattedTime = `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+
+      // Build breakdown dynamically based on what was actually asked
+      const br = [];
+      if (statsRef.current.major.total > 0) {
+        br.push({ name: "Major Triad", correct: statsRef.current.major.correct, total: statsRef.current.major.total });
+      }
+      if (statsRef.current.minor.total > 0) {
+        br.push({ name: "Minor Triad", correct: statsRef.current.minor.correct, total: statsRef.current.minor.total });
+      }
+
+      // Format output payload
       setSessionResult({
         correct: doneCorrect,
         total: doneCount,
-        timeElapsed: "—",
-        breakdown: [
+        timeElapsed: formattedTime,
+        breakdown: br.length > 0 ? br : [
           { name: "Major Triad", correct: 0, total: 0 },
           { name: "Minor Triad", correct: 0, total: 0 },
         ],
@@ -222,7 +281,7 @@ export function useExerciseSession(): ExerciseSessionState & ExerciseSessionActi
       if (!config.melodicSequence) {
         const newSlots: (IntervalSymbol | null)[] = [symbol];
         setSlots(newSlots);
-        checkAnswer(newSlots, question.targetIntervals);
+        checkAnswer(newSlots, question);
         return;
       }
       const nextEmpty = currentSlots.findIndex((s) => s === null);
