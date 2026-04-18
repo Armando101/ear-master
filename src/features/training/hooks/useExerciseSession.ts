@@ -87,6 +87,13 @@ export function useExerciseSession(): ExerciseSessionState & ExerciseSessionActi
     minor: { total: 0, correct: 0 },
   });
 
+  /**
+   * Look-ahead buffer: holds the already-generated + pre-loaded next question.
+   * Populated right after the current question starts playing, consumed by handleNext().
+   * Stored in a ref (not state) so it never triggers a re-render.
+   */
+  const nextQuestionRef = useRef<ExerciseQuestion | null>(null);
+
   const [currentExercise, setCurrentExercise] = useState(1);
   const [correctCount, setCorrectCount] = useState(0);
   const [activeStep, setActiveStep] = useState<ExerciseStep>(1);
@@ -134,8 +141,14 @@ export function useExerciseSession(): ExerciseSessionState & ExerciseSessionActi
 
   const startNewQuestion = useCallback(
     (q: ExerciseQuestion) => {
-      // Kick off preloading immediately so files are cached before playback
+      // 1. Preload audio for THIS question immediately
       preloadQuestion(q);
+
+      // 2. Generate + preload the NEXT question in the background (look-ahead)
+      //    Only if there are more exercises remaining after this one.
+      const nextQ = generateQuestion(config);
+      nextQuestionRef.current = nextQ;
+      preloadQuestion(nextQ); // silently downloads its audio while user listens
 
       const slotCount = config.melodicSequence ? q.targetIntervals.length : 1;
       setQuestion(q);
@@ -146,7 +159,7 @@ export function useExerciseSession(): ExerciseSessionState & ExerciseSessionActi
       setActiveStep(1);
       playContext(q);
     },
-    [config.melodicSequence, playContext]
+    [config, playContext]
   );
 
   // Initialize first question on mount
@@ -311,7 +324,10 @@ export function useExerciseSession(): ExerciseSessionState & ExerciseSessionActi
     }
     const nextExercise = currentExercise + 1;
     setCurrentExercise(nextExercise);
-    const q = generateQuestion(config);
+
+    // Consume the pre-buffered question if available, otherwise generate on the spot
+    const q = nextQuestionRef.current ?? generateQuestion(config);
+    nextQuestionRef.current = null; // clear — startNewQuestion will populate the next one
     startNewQuestion(q);
   }, [currentExercise, config, correctCount, pushResults, startNewQuestion]);
 
