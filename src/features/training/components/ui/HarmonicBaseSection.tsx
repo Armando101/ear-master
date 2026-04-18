@@ -2,6 +2,9 @@ import type { TriadType, TetradType } from "@/features/training/domain/training.
 import { TRIADS, TETRADS } from "@/features/training/domain/training.constants";
 import ChordChip from "./ChordChip";
 
+/** Triads available in this iteration */
+const ENABLED_TRIADS: TriadType[] = ["major", "minor"];
+
 interface HarmonicBaseSectionProps {
   selectedTriads: TriadType[];
   selectedTetrads: TetradType[];
@@ -46,14 +49,19 @@ export default function HarmonicBaseSection({
             </button>
           </div>
           <div className="flex flex-wrap gap-2">
-            {TRIADS.map(({ value, label }) => (
-              <ChordChip
-                key={value}
-                label={label}
-                selected={selectedTriads.includes(value)}
-                onClick={() => onToggleTriad(value)}
-              />
-            ))}
+            {TRIADS.map(({ value, label }) => {
+              const isEnabled = ENABLED_TRIADS.includes(value);
+              return (
+                <ChordChip
+                  key={value}
+                  label={label}
+                  selected={isEnabled && selectedTriads.includes(value)}
+                  onClick={() => onToggleTriad(value)}
+                  disabled={!isEnabled}
+                  tooltip="Coming soon"
+                />
+              );
+            })}
           </div>
         </div>
 
@@ -63,22 +71,25 @@ export default function HarmonicBaseSection({
             <label className="font-label text-xs uppercase tracking-widest text-[var(--color-outline)]">
               Tetrads to practice
             </label>
-            <button
-              type="button"
-              onClick={onSelectAllTetrads}
-              className="text-xs font-bold hover:underline transition-colors"
-              style={{ color: allTetradsSelected ? "var(--color-error)" : "var(--color-primary)" }}
+            <span
+              className="text-[10px] font-label font-bold uppercase tracking-widest px-2 py-0.5 rounded"
+              style={{
+                background: "var(--color-surface-container-high)",
+                color: "var(--color-on-surface-variant)",
+              }}
             >
-              {allTetradsSelected ? "Deselect All" : "Select All"}
-            </button>
+              Coming soon
+            </span>
           </div>
           <div className="flex flex-wrap gap-2">
             {TETRADS.map(({ value, label }) => (
               <ChordChip
                 key={value}
                 label={label}
-                selected={selectedTetrads.includes(value)}
-                onClick={() => onToggleTetrad(value)}
+                selected={false}
+                onClick={() => {}}
+                disabled
+                tooltip="Coming soon"
               />
             ))}
           </div>

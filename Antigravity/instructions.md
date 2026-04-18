@@ -43,11 +43,19 @@ Esto quiere decir que si la triada es sus2 o sus4, aleatoriamente el contexto pu
 
 ### Lógica de audios
 
-Para el contexto se van a dar con el siguiente formato: `[triada/tétrada]_context.mp3`, ejemplo: `c_maj_context.mp3` (cadencia y arpegio de la tétrada C maj7) + o `c_min_maj7_context.mp3` (cadencia y arpegio de la tétrada C min(Maj7)), `c_context.mp3` (cadencia y arpegio de la triada C mayor), `c_min_context.mp3` (cadencia y arpegio de la triada C menor)
+Para el contexto se van a dar con el siguiente formato: `[triada/tétrada]_context.mp3`, ejemplo: `c_maj_context.mp3` (cadencia y arpegio de la tétrada C maj7), `c_min_maj7_context.mp3` (cadencia y arpegio de la tétrada C min(Maj7)), `c_context.mp3` (cadencia y arpegio de la triada C mayor), `c_min_context.mp3` (cadencia y arpegio de la triada C menor)
 
 Para las notas musicales aisladas se tendrán archivos con este formato `[nota].mp3`
 
-Ej. `C.mp3`, `C#.mp3`, `Db.mp3`, etc.
+Ej. `C.mp3`, `Cs.mp3`, `D.mp3`, etc.
+
+Dependiendo la escala y el intervalo puede pedir una nota de Db, pero internamente el sistema escogerá el audio de C#. Por ejemplo.
+
+Estamos en Ab y se pregunta por una 4J, la nota correcta sería un Db, pero internamente, el sistema tomará el C#.
+
+Todo en los audios de las notas está estandarizado a sostenidos (#), la notación de los audios, para el sostenido, no será “#”, será una “s” de sostendio
+
+Los audios se encuentran en la carpeta @audios que se encuentra dentro de resources, que a su vez está dentro de la carpeta antigravity
 
 La app debe hacer el calculo de los intervalos nunca debe mostrar el nombre de las notas, siempre intervalos.
 
@@ -166,3 +174,23 @@ Tetradas disponibles
 - Maj 6
 - Menor maj7
 - Menor 7
+
+Escalas posibles:
+
+- C: C D E F G A B C
+- G: G A B C D E F# G
+- D:  D E F# G A B C# D
+- A: A B C# D E F# G# A
+- E: E F# G# A B C# D# E
+- B: B C# D# E F# G# A# B
+- F#: F# G# A# B C# D# E# F#
+- C#: C# D# E# F# G# A# B# C#
+- F: F G A Bb C D E F
+- Bb: Bb C D Eb F G A Bb
+- Eb: Eb F G Ab Bb C D Eb
+- Ab: Ab Bb C Db Eb F G Ab
+- Db: Db Eb F Gb Ab Bb C Db
+- Gb: Gb Ab Bb Cb Db Eb F Gb
+- Cb: Cb Db Eb Fb Gb Ab Bb Cb
+
+Para las escalas menores se obtiene su relativo menor
