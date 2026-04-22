@@ -1,5 +1,5 @@
-import type { PitchClass, ChordQuality } from "../domain/music.types";
-import { pitchToAudioKey, pitchToMajorContextKey } from "../domain/music.rules";
+import type { PitchClass, ChordQuality, PitchNote } from "../domain/music.types";
+import { pitchToAudioKey, pitchToNoteKey, pitchToMajorContextKey } from "../domain/music.rules";
 
 // ---------------------------------------------------------------------------
 // AudioService — Polyphonic Voice Architecture
@@ -61,14 +61,38 @@ export class AudioService {
 
   // ── URL helpers ───────────────────────────────────────────────────────────
 
-  contextUrl(root: PitchClass, quality: ChordQuality): string {
-    return quality === "major"
-      ? `/audios/major/${pitchToMajorContextKey(root)}_context.wav`
-      : `/audios/minor/${pitchToAudioKey(root)}_min_context.wav`;
+  /**
+   * Returns the context audio URL for the given chord root, octave, and quality.
+   *
+   * Format: `/audios/[key][octave]_context.wav`  (major triads)
+   *       or `/audios/[key][octave]_min_context.wav` (minor triads)
+   * Examples:
+   *   C major octave 3  → `/audios/c3_context.wav`
+   *   C minor octave 3  → `/audios/c3_min_context.wav`
+   *   C maj7  octave 3  → `/audios/c3_maj_context.wav`
+   *   C mMaj7 octave 3  → `/audios/c3_min_maj7_context.wav`
+   * (For this first iteration only major/minor triads are used.)
+   */
+  contextUrl(root: PitchClass, octave: number, quality: ChordQuality): string {
+    const key = quality === "major"
+      ? pitchToMajorContextKey(root)
+      : pitchToAudioKey(root);
+    const suffix = quality === "major" ? "_context.wav" : "_min_context.wav";
+    const folder = quality === "major" ? "major" : "minor";
+    return `/audios/${folder}/${key}${octave}${suffix}`;
   }
 
-  noteUrl(pitch: PitchClass): string {
-    return `/audios/notes/${pitchToAudioKey(pitch)}.wav`;
+  /**
+   * Returns the isolated note audio URL.
+   *
+   * Format: `/audios/[nota][octava].wav`
+   * Examples: `c3.wav`, `cs4.wav`, `d3.wav`
+   *
+   * Uses the lowercase sharp key (via pitchToAudioKey) to match the actual
+   * file naming convention on disk.
+   */
+  noteUrl(note: PitchNote): string {
+    return `/audios/notes/${pitchToNoteKey(note.pitch)}${note.octave}.wav`;
   }
 
   // ── Global stop ───────────────────────────────────────────────────────────
@@ -100,9 +124,9 @@ export class AudioService {
    * Any previously playing context is stopped first.
    * Returns a Promise that resolves when the audio finishes.
    */
-  playContext(root: PitchClass, quality: ChordQuality): Promise<void> {
+  playContext(root: PitchClass, octave: number, quality: ChordQuality): Promise<void> {
     this._stopContext();
-    const src = this.contextUrl(root, quality);
+    const src = this.contextUrl(root, octave, quality);
 
     // Clone from cache master (or create a fresh element as fallback).
     // Cloning inherits the src attribute and browser-cached data.
@@ -149,8 +173,8 @@ export class AudioService {
    * Returns a Promise that resolves when this note's playback ends,
    * allowing callers to `await` sequential note chains.
    */
-  playNote(pitch: PitchClass): Promise<void> {
-    const src = this.noteUrl(pitch);
+  playNote(note: PitchNote): Promise<void> {
+    const src = this.noteUrl(note);
     const master = this.cache.get(src) ?? new Audio(src);
     const voice = master.cloneNode(false) as HTMLAudioElement;
     if (!voice.src) voice.src = src;

@@ -43,11 +43,11 @@ Esto quiere decir que si la triada es sus2 o sus4, aleatoriamente el contexto pu
 
 ### Lógica de audios
 
-Para el contexto se van a dar con el siguiente formato: `[triada/tétrada][octava]_context.mp3`, ejemplo: `c3_maj_context.mp3` (cadencia y arpegio de la tétrada C maj7), `c3_min_maj7_context.mp3` (cadencia y arpegio de la tétrada C min(Maj7)), `c3_context.mp3` (cadencia y arpegio de la triada C mayor), `c3_min_context.mp3` (cadencia y arpegio de la triada C menor)
+Para el contexto se van a dar con el siguiente formato: `[triada/tétrada][octava]_context.wav`, ejemplo: `c3_maj_context.wav` (cadencia y arpegio de la tétrada C maj7), `c3_min_maj7_context.wav` (cadencia y arpegio de la tétrada C min(Maj7)), `c3_context.wav` (cadencia y arpegio de la triada C mayor), `c3_min_context.wav` (cadencia y arpegio de la triada C menor)
 
-Para las notas musicales aisladas se tendrán archivos con este formato `[nota][octava].mp3`
+Para las notas musicales aisladas se tendrán archivos con este formato `[nota][octava].wav`
 
-Ej. `C3.mp3`, `Cs3.mp3`, `D3.mp3`, etc.
+Ej. `c3.wav`, `cs3.wav`, `d3.wav`, etc.
 
 El número de octava está dado por el número que de octava de la tónica.
 

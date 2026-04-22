@@ -6,9 +6,8 @@ import confetti from "canvas-confetti";
 import { useTrainingStore } from "@/store/trainingStore";
 import type { IntervalSymbol, IntervalState, ExerciseStep } from "@/features/training/domain/training.types";
 import type { ExerciseQuestion } from "@/features/training/domain/music.types";
-import type { PitchClass } from "@/features/training/domain/music.types";
 import { generateQuestion } from "@/features/training/domain/session.engine";
-import { transposePitch, intervalToSemitones } from "@/features/training/domain/music.rules";
+import { transposePitchNote, intervalToSemitones } from "@/features/training/domain/music.rules";
 import { audioService } from "@/features/training/services/audio.service";
 
 // ---------------------------------------------------------------------------
@@ -55,12 +54,12 @@ function buildEmptySlots(count: number): (IntervalSymbol | null)[] {
 function preloadQuestion(q: ExerciseQuestion): void {
   const urls: string[] = [
     // 1. The context (cadence + arpeggio)
-    audioService.contextUrl(q.chord.root, q.chord.quality),
+    audioService.contextUrl(q.chord.root, q.chord.octave, q.chord.quality),
     // 2. Every note in the sequence
     ...q.targetIntervals.map((interval) => {
       const semitones = intervalToSemitones(interval);
-      const pitch: PitchClass = transposePitch(q.chord.root, semitones);
-      return audioService.noteUrl(pitch);
+      const note = transposePitchNote(q.chord.root, q.chord.octave, semitones);
+      return audioService.noteUrl(note);
     }),
   ];
   audioService.preload(urls);
@@ -110,7 +109,7 @@ export function useExerciseSession(): ExerciseSessionState & ExerciseSessionActi
 
   const playContext = useCallback(async (q: ExerciseQuestion) => {
     setIsPlayingAudio(true);
-    await audioService.playContext(q.chord.root, q.chord.quality);
+    await audioService.playContext(q.chord.root, q.chord.octave, q.chord.quality);
     setIsPlayingAudio(false);
     setActiveStep(2);
 
@@ -118,8 +117,8 @@ export function useExerciseSession(): ExerciseSessionState & ExerciseSessionActi
     setIsPlayingAudio(true);
     for (const interval of q.targetIntervals) {
       const semitones = intervalToSemitones(interval);
-      const notePitch: PitchClass = transposePitch(q.chord.root, semitones);
-      await audioService.playNote(notePitch);
+      const note = transposePitchNote(q.chord.root, q.chord.octave, semitones);
+      await audioService.playNote(note);
     }
     setIsPlayingAudio(false);
     setActiveStep(3);
@@ -129,8 +128,8 @@ export function useExerciseSession(): ExerciseSessionState & ExerciseSessionActi
     setIsPlayingAudio(true);
     for (const interval of q.targetIntervals) {
       const semitones = intervalToSemitones(interval);
-      const notePitch: PitchClass = transposePitch(q.chord.root, semitones);
-      await audioService.playNote(notePitch);
+      const note = transposePitchNote(q.chord.root, q.chord.octave, semitones);
+      await audioService.playNote(note);
     }
     setIsPlayingAudio(false);
   }, []);

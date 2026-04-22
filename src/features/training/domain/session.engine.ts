@@ -17,6 +17,13 @@ import {
 
 const SUPPORTED_QUALITIES: ChordQuality[] = ["major", "minor"];
 
+/**
+ * The octave for the tonic. All context and note files are recorded at octave 3
+ * (e.g. `c3_context.mp3`, `C3.mp3`, `Cs4.mp3`).
+ * Update this constant if a different register is preferred in future iterations.
+ */
+const DEFAULT_OCTAVE = 3;
+
 function resolveQualities(config: ExerciseConfig): ChordQuality[] {
   const selected = config.triads.filter((t): t is ChordQuality =>
     SUPPORTED_QUALITIES.includes(t as ChordQuality)
@@ -42,7 +49,7 @@ export function generateQuestion(config: ExerciseConfig): ExerciseQuestion {
     : [pickTargetInterval(availableIntervals)];
 
   return {
-    chord: { root, quality },
+    chord: { root, octave: DEFAULT_OCTAVE, quality },
     targetIntervals,
     availableIntervals,
   };

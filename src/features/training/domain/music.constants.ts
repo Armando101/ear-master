@@ -20,8 +20,9 @@ export const PITCH_CLASSES: PitchClass[] = [
 /**
  * Maps a pitch class to the lowercase audio file key used in:
  *   - /public/audios/minor/{key}_min_context.wav
- *   - /public/audios/notes/{key}.wav
- * Minor context and individual notes use sharps throughout.
+ *
+ * Minor context files use sharps for Cs and Fs, but sharps for Ds/Gs/As too
+ * (kept as-is from the original recording set for minor context).
  */
 export const PITCH_TO_AUDIO_KEY: Record<PitchClass, string> = {
   C:  "c",
@@ -35,6 +36,28 @@ export const PITCH_TO_AUDIO_KEY: Record<PitchClass, string> = {
   Gs: "gs",
   A:  "a",
   As: "as",
+  B:  "b",
+};
+
+/**
+ * Maps a pitch class to the lowercase audio file key used in:
+ *   - /public/audios/notes/{key}{octave}.wav
+ *
+ * Note files use: c cs d eb e f fs g ab a bb b
+ * i.e. flat notation for Ds→eb, Gs→ab, As→bb.
+ */
+export const PITCH_TO_NOTE_KEY: Record<PitchClass, string> = {
+  C:  "c",
+  Cs: "cs",
+  D:  "d",
+  Ds: "eb",  // flat
+  E:  "e",
+  F:  "f",
+  Fs: "fs",
+  G:  "g",
+  Gs: "ab",  // flat
+  A:  "a",
+  As: "bb",  // flat
   B:  "b",
 };
 

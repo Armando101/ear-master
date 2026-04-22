@@ -1,9 +1,10 @@
-import type { PitchClass, ChordQuality } from "./music.types";
+import type { PitchClass, ChordQuality, PitchNote } from "./music.types";
 import type { IntervalSymbol } from "./training.types";
 import type { TargetNotes } from "./training.types";
 import {
   PITCH_CLASSES,
   PITCH_TO_AUDIO_KEY,
+  PITCH_TO_NOTE_KEY,
   PITCH_TO_MAJOR_CONTEXT_KEY,
   INTERVAL_SEMITONES,
   MAJOR_TRIAD_INTERVALS,
@@ -27,6 +28,15 @@ import {
  */
 export function pitchToAudioKey(pitch: PitchClass): string {
   return PITCH_TO_AUDIO_KEY[pitch];
+}
+
+/**
+ * Converts a pitch class to the lowercase audio file key for:
+ *   - Individual note files (/audios/notes/{key}{octave}.wav)
+ * Uses flat notation for Ds→eb, Gs→ab, As→bb.
+ */
+export function pitchToNoteKey(pitch: PitchClass): string {
+  return PITCH_TO_NOTE_KEY[pitch];
 }
 
 /**
@@ -63,6 +73,30 @@ export function transposePitch(root: PitchClass, semitones: number): PitchClass 
   const rootIndex = PITCH_CLASSES.indexOf(root);
   const targetIndex = (rootIndex + semitones) % 12;
   return PITCH_CLASSES[targetIndex];
+}
+
+/**
+ * Returns the fully-resolved note (pitch class + octave) that is `semitones`
+ * above `root` at `rootOctave`.
+ *
+ * The octave increments each time the pitch wraps past B (i.e., the target
+ * chromatic index is less than the root's chromatic index within the same
+ * span), which correctly handles cases like A3 → C#4, E4.
+ *
+ * Extensions (9th, 11th, 13th) are NOT asked — intervals are always ≤ 12
+ * semitones — but the octave boundary crossing is still respected.
+ */
+export function transposePitchNote(
+  root: PitchClass,
+  rootOctave: number,
+  semitones: number
+): PitchNote {
+  const rootIndex = PITCH_CLASSES.indexOf(root);
+  const targetChromaticIndex = rootIndex + semitones;
+  const pitch = PITCH_CLASSES[targetChromaticIndex % 12];
+  // Each full 12-semitone wrap adds one octave.
+  const octave = rootOctave + Math.floor(targetChromaticIndex / 12);
+  return { pitch, octave };
 }
 
 // ---------------------------------------------------------------------------
