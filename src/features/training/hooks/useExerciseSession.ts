@@ -52,17 +52,16 @@ function buildEmptySlots(count: number): (IntervalSymbol | null)[] {
  * buffered by the time playback is actually requested.
  */
 function preloadQuestion(q: ExerciseQuestion): void {
-  const urls: string[] = [
-    // 1. The context (cadence + arpeggio)
-    audioService.contextUrl(q.chord.root, q.chord.octave, q.chord.quality),
-    // 2. Every note in the sequence
-    ...q.targetIntervals.map((interval) => {
-      const semitones = intervalToSemitones(interval);
-      const note = transposePitchNote(q.chord.root, q.chord.octave, semitones);
-      return audioService.noteUrl(note);
-    }),
-  ];
-  audioService.preload(urls);
+  // Context file → HTMLAudioElement (clone-on-play)
+  audioService.preloadContext([audioService.contextUrl(q.chord.root, q.chord.octave, q.chord.quality)]);
+
+  // Note files → AudioBuffer (fetch + decode, fire-and-forget)
+  const noteUrls = q.targetIntervals.map((interval) => {
+    const semitones = intervalToSemitones(interval);
+    const note = transposePitchNote(q.chord.root, q.chord.octave, semitones);
+    return audioService.noteUrl(note);
+  });
+  audioService.preloadNotes(noteUrls);
 }
 
 // ---------------------------------------------------------------------------
@@ -107,32 +106,31 @@ export function useExerciseSession(): ExerciseSessionState & ExerciseSessionActi
   // Audio orchestration
   // ---------------------------------------------------------------------------
 
+  /** Resolves all target intervals to PitchNote objects for the given question. */
+  const resolveNotes = useCallback((q: ExerciseQuestion) =>
+    q.targetIntervals.map((interval) =>
+      transposePitchNote(q.chord.root, q.chord.octave, intervalToSemitones(interval))
+    )
+  , []);
+
   const playContext = useCallback(async (q: ExerciseQuestion) => {
     setIsPlayingAudio(true);
     await audioService.playContext(q.chord.root, q.chord.octave, q.chord.quality);
     setIsPlayingAudio(false);
     setActiveStep(2);
 
-    // Auto-play the note(s) after context finishes
+    // All notes scheduled at once via Web Audio API — zero gap between notes
     setIsPlayingAudio(true);
-    for (const interval of q.targetIntervals) {
-      const semitones = intervalToSemitones(interval);
-      const note = transposePitchNote(q.chord.root, q.chord.octave, semitones);
-      await audioService.playNote(note);
-    }
+    await audioService.playNoteSequence(resolveNotes(q));
     setIsPlayingAudio(false);
     setActiveStep(3);
-  }, []);
+  }, [resolveNotes]);
 
   const playNoteOnly = useCallback(async (q: ExerciseQuestion) => {
     setIsPlayingAudio(true);
-    for (const interval of q.targetIntervals) {
-      const semitones = intervalToSemitones(interval);
-      const note = transposePitchNote(q.chord.root, q.chord.octave, semitones);
-      await audioService.playNote(note);
-    }
+    await audioService.playNoteSequence(resolveNotes(q));
     setIsPlayingAudio(false);
-  }, []);
+  }, [resolveNotes]);
 
   // ---------------------------------------------------------------------------
   // Question initialization

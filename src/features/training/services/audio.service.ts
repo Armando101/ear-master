@@ -2,114 +2,107 @@ import type { PitchClass, ChordQuality, PitchNote } from "../domain/music.types"
 import { pitchToAudioKey, pitchToNoteKey, pitchToMajorContextKey } from "../domain/music.rules";
 
 // ---------------------------------------------------------------------------
-// AudioService — Polyphonic Voice Architecture
+// AudioService — Dual-layer architecture
 // ---------------------------------------------------------------------------
 //
-// Two independent playback layers:
+//  CONTEXT layer  (HTMLAudioElement, monophonic)
+//    Long cadence/arpeggio files. One exclusive slot; cloned from a preloaded
+//    master so network latency is zero.
 //
-//  1. CONTEXT  (monophonic): One exclusive slot for chord cadences/arpeggios.
-//     Starting a new context immediately stops the previous one.
-//
-//  2. NOTE VOICES (polyphonic): A dynamic Set of short-lived HTMLAudioElement
-//     clones, one per note in the melodic sequence.
-//     Each clone is spawned from a preloaded master element, so it starts
-//     playing in the same tick with zero network latency.
-//     When a clone finishes it removes itself from the Set automatically.
-//
-// JIT Preload Cache:
-//     preload(urls) silently creates master Audio elements and stores them.
-//     These masters are NEVER played directly — only cloned.
-//     Clones inherit the decoded data (or fetch from browser cache instantly).
+//  NOTE layer  (Web Audio API, gapless scheduling)
+//    Short individual note files decoded into AudioBuffers.
+//    All notes in a sequence are scheduled upfront at precise
+//    AudioContext.currentTime offsets → zero JS-event-loop gap between notes.
+//    Preloading = fetch() + decodeAudioData() (fire-and-forget).
+//    playNoteSequence() awaits any still-in-flight decodes before scheduling.
 //
 // ---------------------------------------------------------------------------
 
 export class AudioService {
-  // ── Cache ─────────────────────────────────────────────────────────────────
 
-  /**
-   * Master cache: URL → preloaded HTMLAudioElement.
-   * Masters are never played; they serve as clone sources.
-   */
-  private cache = new Map<string, HTMLAudioElement>();
+  // ── Web Audio context (lazy) ───────────────────────────────────────────────
 
-  // ── Layers ────────────────────────────────────────────────────────────────
+  private _ctx: AudioContext | null = null;
 
-  /** Exclusive slot for the chord cadence/arpeggio (monophonic). */
-  private contextVoice: HTMLAudioElement | null = null;
-
-  /**
-   * Active note clones (polyphonic).
-   * Each entry is a live clone produced from a cache master.
-   * Entries remove themselves on "ended" or "error".
-   */
-  private noteVoices = new Set<HTMLAudioElement>();
-
-  // ── Preloading ────────────────────────────────────────────────────────────
-
-  /**
-   * Silently pre-fetches a list of URLs into master Audio elements.
-   * Safe to call multiple times — already-cached URLs are skipped.
-   */
-  preload(urls: string[]): void {
-    for (const url of urls) {
-      if (this.cache.has(url)) continue;
-      const master = new Audio(url);
-      master.preload = "auto"; // tell the browser to buffer aggressively
-      this.cache.set(url, master);
+  private get ctx(): AudioContext {
+    if (!this._ctx) {
+      this._ctx = new (window.AudioContext ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
     }
+    return this._ctx;
   }
+
+  // ── Note buffer cache (Web Audio API) ─────────────────────────────────────
+
+  /** Decoded AudioBuffers, keyed by URL. */
+  private bufferCache = new Map<string, AudioBuffer>();
+
+  /**
+   * In-flight fetch+decode promises.
+   * Kept until the buffer is stored in bufferCache, then deleted.
+   * playNoteSequence() awaits these if a URL is still loading.
+   */
+  private bufferLoading = new Map<string, Promise<void>>();
+
+  // ── Context HTML cache (HTMLAudioElement) ──────────────────────────────────
+
+  private htmlCache = new Map<string, HTMLAudioElement>();
+
+  // ── Active playback handles ────────────────────────────────────────────────
+
+  private contextVoice: HTMLAudioElement | null = null;
+  private noteNodes: AudioBufferSourceNode[] = [];
+  private noteResolve: (() => void) | null = null;
 
   // ── URL helpers ───────────────────────────────────────────────────────────
 
-  /**
-   * Returns the context audio URL for the given chord root, octave, and quality.
-   *
-   * Format: `/audios/[key][octave]_context.wav`  (major triads)
-   *       or `/audios/[key][octave]_min_context.wav` (minor triads)
-   * Examples:
-   *   C major octave 3  → `/audios/c3_context.wav`
-   *   C minor octave 3  → `/audios/c3_min_context.wav`
-   *   C maj7  octave 3  → `/audios/c3_maj_context.wav`
-   *   C mMaj7 octave 3  → `/audios/c3_min_maj7_context.wav`
-   * (For this first iteration only major/minor triads are used.)
-   */
   contextUrl(root: PitchClass, octave: number, quality: ChordQuality): string {
-    const key = quality === "major"
-      ? pitchToMajorContextKey(root)
-      : pitchToAudioKey(root);
+    const key    = quality === "major" ? pitchToMajorContextKey(root) : pitchToAudioKey(root);
     const suffix = quality === "major" ? "_context.wav" : "_min_context.wav";
     const folder = quality === "major" ? "major" : "minor";
     return `/audios/${folder}/${key}${octave}${suffix}`;
   }
 
-  /**
-   * Returns the isolated note audio URL.
-   *
-   * Format: `/audios/[nota][octava].wav`
-   * Examples: `c3.wav`, `cs4.wav`, `d3.wav`
-   *
-   * Uses the lowercase sharp key (via pitchToAudioKey) to match the actual
-   * file naming convention on disk.
-   */
   noteUrl(note: PitchNote): string {
     return `/audios/notes/${pitchToNoteKey(note.pitch)}${note.octave}.wav`;
   }
 
-  // ── Global stop ───────────────────────────────────────────────────────────
+  // ── Preloading ────────────────────────────────────────────────────────────
 
-  /**
-   * Immediately stops ALL audio:
-   * the context voice and every active note voice.
-   */
-  stop(): void {
-    this._stopContext();
-    for (const voice of this.noteVoices) {
-      voice.pause();
+  /** Preload context files as HTMLAudioElement masters (clone-on-play). */
+  preloadContext(urls: string[]): void {
+    for (const url of urls) {
+      if (this.htmlCache.has(url)) continue;
+      const el = new Audio(url);
+      el.preload = "auto";
+      this.htmlCache.set(url, el);
     }
-    this.noteVoices.clear();
   }
 
-  // ── Context layer (monophonic) ────────────────────────────────────────────
+  /**
+   * Fire-and-forget fetch + decode of note files into AudioBuffers.
+   * Safe to call multiple times — already-cached or in-flight URLs are skipped.
+   */
+  preloadNotes(urls: string[]): void {
+    for (const url of urls) {
+      if (this.bufferCache.has(url) || this.bufferLoading.has(url)) continue;
+
+      const p = fetch(url)
+        .then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.arrayBuffer(); })
+        .then((ab) => this.ctx.decodeAudioData(ab))
+        .then((buf) => { this.bufferCache.set(url, buf); })
+        .catch((err) => { console.error("[AudioService] Note preload failed:", url, err); })
+        .finally(() => { this.bufferLoading.delete(url); });
+
+      this.bufferLoading.set(url, p);
+    }
+  }
+
+  // ── Global stop ───────────────────────────────────────────────────────────
+
+  stop(): void {
+    this._stopContext();
+    this._stopNotes();
+  }
 
   private _stopContext(): void {
     if (this.contextVoice) {
@@ -119,22 +112,22 @@ export class AudioService {
     }
   }
 
-  /**
-   * Plays the chord cadence + arpeggio exclusively.
-   * Any previously playing context is stopped first.
-   * Returns a Promise that resolves when the audio finishes.
-   */
+  private _stopNotes(): void {
+    for (const node of this.noteNodes) {
+      try { node.stop(); } catch { /* already stopped */ }
+    }
+    this.noteNodes = [];
+    if (this.noteResolve) { this.noteResolve(); this.noteResolve = null; }
+  }
+
+  // ── Context layer (HTMLAudioElement, monophonic) ──────────────────────────
+
   playContext(root: PitchClass, octave: number, quality: ChordQuality): Promise<void> {
     this._stopContext();
-    const src = this.contextUrl(root, octave, quality);
-
-    // Clone from cache master (or create a fresh element as fallback).
-    // Cloning inherits the src attribute and browser-cached data.
-    const master = this.cache.get(src) ?? new Audio(src);
-    const voice = master.cloneNode(false) as HTMLAudioElement;
-    // Ensure src is set — cloneNode copies attributes but let's be explicit:
+    const src    = this.contextUrl(root, octave, quality);
+    const master = this.htmlCache.get(src) ?? new Audio(src);
+    const voice  = master.cloneNode(false) as HTMLAudioElement;
     if (!voice.src) voice.src = src;
-
     this.contextVoice = voice;
 
     return new Promise<void>((resolve) => {
@@ -144,62 +137,73 @@ export class AudioService {
         if (this.contextVoice === voice) this.contextVoice = null;
       };
       const onEnded = () => { cleanup(); resolve(); };
-      const onError = (e: Event) => {
-        cleanup();
-        console.error("[AudioService] Context error:", src, e);
-        resolve();
-      };
+      const onError = (e: Event) => { cleanup(); console.error("[AudioService] Context error:", src, e); resolve(); };
       voice.addEventListener("ended", onEnded);
       voice.addEventListener("error", onError);
-      voice.play().catch((err) => {
-        cleanup();
-        console.error("[AudioService] Context play() rejected:", err);
-        resolve();
-      });
+      voice.play().catch((err) => { cleanup(); console.error("[AudioService] Context play() rejected:", err); resolve(); });
     });
   }
 
-  // ── Note layer (polyphonic) ───────────────────────────────────────────────
+  // ── Note layer (Web Audio API, gapless scheduling) ────────────────────────
 
   /**
-   * Plays a single note via a fresh voice clone.
+   * Plays a sequence of notes with zero gap between them.
    *
-   * ─ The clone is spawned from the preloaded master in the cache, so it
-   *   starts playing with zero JS-level latency.
-   * ─ The previous note's natural decay (tail) can still ring as the next
-   *   clone fires — no hard cuts between sequential notes.
-   * ─ The clone lives in `noteVoices` until it finishes and removes itself.
+   * All AudioBufferSourceNodes are created and scheduled before the first
+   * sample plays. The browser's audio thread executes each start time at
+   * sample-accuracy — no JS round-trips between notes.
    *
-   * Returns a Promise that resolves when this note's playback ends,
-   * allowing callers to `await` sequential note chains.
+   * If a buffer is still being decoded (preloadNotes in flight), we await it
+   * before scheduling so playback is never skipped.
    */
-  playNote(note: PitchNote): Promise<void> {
-    const src = this.noteUrl(note);
-    const master = this.cache.get(src) ?? new Audio(src);
-    const voice = master.cloneNode(false) as HTMLAudioElement;
-    if (!voice.src) voice.src = src;
+  async playNoteSequence(notes: PitchNote[]): Promise<void> {
+    this._stopNotes();
+    if (notes.length === 0) return;
 
-    this.noteVoices.add(voice);
+    // Await any in-flight decodes for the notes we're about to play
+    const inFlight = notes
+      .map((n) => this.bufferLoading.get(this.noteUrl(n)))
+      .filter((p): p is Promise<void> => p !== undefined);
+    if (inFlight.length > 0) await Promise.all(inFlight);
+
+    // Resume AudioContext if suspended (required on mobile after inactivity)
+    if (this.ctx.state === "suspended") await this.ctx.resume();
 
     return new Promise<void>((resolve) => {
-      const cleanup = () => {
-        voice.removeEventListener("ended", onEnded);
-        voice.removeEventListener("error", onError);
-        this.noteVoices.delete(voice);
+      this.noteResolve = resolve;
+
+      let startTime    = this.ctx.currentTime + 0.05; // 50 ms lead-in
+      let pendingCount = notes.length;
+
+      const onNodeEnded = (node: AudioBufferSourceNode) => {
+        const idx = this.noteNodes.indexOf(node);
+        if (idx !== -1) this.noteNodes.splice(idx, 1);
+        pendingCount--;
+        if (pendingCount <= 0) { this.noteResolve?.(); this.noteResolve = null; }
       };
-      const onEnded = () => { cleanup(); resolve(); };
-      const onError = (e: Event) => {
-        cleanup();
-        console.error("[AudioService] Note error:", src, e);
-        resolve();
-      };
-      voice.addEventListener("ended", onEnded);
-      voice.addEventListener("error", onError);
-      voice.play().catch((err) => {
-        cleanup();
-        console.error("[AudioService] Note play() rejected:", err);
-        resolve();
-      });
+
+      for (const note of notes) {
+        const url    = this.noteUrl(note);
+        const buffer = this.bufferCache.get(url);
+
+        if (!buffer) {
+          console.error("[AudioService] Buffer missing at play time:", url);
+          pendingCount--;
+          if (pendingCount <= 0) { resolve(); this.noteResolve = null; }
+          continue;
+        }
+
+        const node = this.ctx.createBufferSource();
+        node.buffer = buffer;
+        node.connect(this.ctx.destination);
+        node.start(startTime);
+        node.onended = () => onNodeEnded(node);
+
+        this.noteNodes.push(node);
+        startTime += buffer.duration;
+      }
+
+      if (notes.length === 0) { resolve(); this.noteResolve = null; }
     });
   }
 }
