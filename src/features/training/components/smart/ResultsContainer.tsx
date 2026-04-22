@@ -2,13 +2,14 @@
 
 import { useRouter } from "next/navigation";
 import { useTrainingStore } from "@/store/trainingStore";
+import type { SessionResult } from "@/features/training/domain/training.types";
 import AccuracyRing from "../ui/AccuracyRing";
 import ChordBreakdownRow from "../ui/ChordBreakdownRow";
 import TechnicalInsightBanner from "../ui/TechnicalInsightBanner";
 import ResultsActionBar from "../ui/ResultsActionBar";
 
 // Fallback mock data (shown when navigating directly to /training/results)
-const MOCK_RESULT = {
+const MOCK_RESULT: SessionResult = {
   correct: 8,
   total: 10,
   timeElapsed: "12:44",
@@ -77,6 +78,35 @@ export default function ResultsContainer() {
         </div>
       </div>
 
+      {/* Scale intervals practiced (shown only when scaleNotes mode was used) */}
+      {result.selectedScaleIntervals && result.selectedScaleIntervals.length > 0 && (
+        <div
+          className="mb-10 p-5 rounded-xl flex flex-wrap items-center gap-3"
+          style={{
+            background: "var(--color-surface-container-low)",
+            borderLeft: "4px solid var(--color-tertiary)",
+          }}
+        >
+          <p className="text-xs font-label uppercase tracking-widest text-[var(--color-on-surface-variant)] shrink-0">
+            Intervals practiced:
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {result.selectedScaleIntervals.map((interval) => (
+              <span
+                key={interval}
+                className="px-3 py-1 rounded-full text-sm font-label font-semibold"
+                style={{
+                  background: "var(--color-primary-container)",
+                  color: "var(--color-on-primary-container)",
+                }}
+              >
+                {interval}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Bento Grid Analysis */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
         {/* Accuracy ring */}
@@ -126,6 +156,8 @@ export default function ResultsContainer() {
 
       {/* Insight Banner */}
       <TechnicalInsightBanner insight={result.insight} />
+
+
 
       {/* Action Buttons */}
       <ResultsActionBar

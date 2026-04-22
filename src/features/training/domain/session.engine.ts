@@ -1,4 +1,4 @@
-import type { ExerciseConfig } from "../domain/training.types";
+import type { ExerciseConfig, IntervalSymbol } from "../domain/training.types";
 import type { ExerciseQuestion, ChordQuality } from "../domain/music.types";
 import {
   getAvailableIntervals,
@@ -38,11 +38,32 @@ function pickRandom<T>(arr: T[]): T {
 /**
  * Generates a single exercise question based on the current session config.
  */
+// Maps quality-relative equivalents so "3" selected as 3M also covers 3m for minor.
+const QUALITY_BRIDGE: Partial<Record<IntervalSymbol, IntervalSymbol>> = {
+  "3M": "3m", "3m": "3M",
+  "6M": "6m", "6m": "6M",
+  "7M": "7m", "7m": "7M",
+};
+
 export function generateQuestion(config: ExerciseConfig): ExerciseQuestion {
   const qualities = resolveQualities(config);
   const quality = pickRandom(qualities);
   const root = pickRandomRoot();
-  const availableIntervals = getAvailableIntervals(quality, config.targetNotes);
+
+  let availableIntervals = getAvailableIntervals(quality, config.targetNotes);
+
+  if (config.targetNotes === "scaleNotes" && config.scaleIntervals.length >= 2) {
+    // Expand the selection to include quality-bridged equivalents so that
+    // selecting "3" (stored as 3M in major-default store) also matches 3m
+    // when the generated chord is minor, and vice-versa.
+    const expandedSelection = new Set<IntervalSymbol>(config.scaleIntervals);
+    for (const sym of config.scaleIntervals) {
+      const bridged = QUALITY_BRIDGE[sym];
+      if (bridged) expandedSelection.add(bridged);
+    }
+    const filtered = availableIntervals.filter((i) => expandedSelection.has(i));
+    if (filtered.length >= 1) availableIntervals = filtered;
+  }
 
   const targetIntervals = config.melodicSequence
     ? generateMelodicSequence(availableIntervals, pickMelodicSequenceLength())

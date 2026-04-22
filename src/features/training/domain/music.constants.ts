@@ -21,21 +21,21 @@ export const PITCH_CLASSES: PitchClass[] = [
  * Maps a pitch class to the lowercase audio file key used in:
  *   - /public/audios/minor/{key}_min_context.wav
  *
- * Minor context files use sharps for Cs and Fs, but sharps for Ds/Gs/As too
- * (kept as-is from the original recording set for minor context).
+ * Uses flat notation for Ds→eb, Gs→ab, As→bb to match actual filenames
+ * (e.g. bb3_min_context.wav, ab3_min_context.wav, eb3_min_context.wav).
  */
 export const PITCH_TO_AUDIO_KEY: Record<PitchClass, string> = {
   C:  "c",
   Cs: "cs",
   D:  "d",
-  Ds: "ds",
+  Ds: "eb",  // flat — no ds3_min_context.wav exists
   E:  "e",
   F:  "f",
   Fs: "fs",
   G:  "g",
-  Gs: "gs",
+  Gs: "ab",  // flat — no gs3_min_context.wav exists
   A:  "a",
-  As: "as",
+  As: "bb",  // flat — no as3_min_context.wav exists
   B:  "b",
 };
 

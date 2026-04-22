@@ -259,10 +259,12 @@ export function useExerciseSession(): ExerciseSessionState & ExerciseSessionActi
           doneCorrect / Math.max(doneCount, 1) >= 0.8
             ? "Great precision! Keep up the consistency in future sessions."
             : "Keep practising — focus on slow, deliberate listening before answering.",
+        selectedScaleIntervals:
+          config.targetNotes === "scaleNotes" ? config.scaleIntervals : undefined,
       });
       router.push("/training/results");
     },
-    [setSessionResult, router]
+    [config.targetNotes, config.scaleIntervals, setSessionResult, router]
   );
 
   // ---------------------------------------------------------------------------

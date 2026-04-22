@@ -67,6 +67,19 @@ Los audios se encuentran en la carpeta @audios que se encuentra dentro de resour
 
 La app debe hacer el calculo de los intervalos nunca debe mostrar el nombre de las notas, siempre intervalos.
 
+### Selector de intervalos de escala (modo "Scale notes")
+
+Cuando el usuario selecciona el modo "Scale notes", aparece un panel de chips con los intervalos de la escala. Las reglas de visualización son:
+
+- Los intervalos de 3ra, 6ta y 7ma se muestran **sin la letra M o m**: se muestran solo como `3`, `6`, `7`.
+- Los demás intervalos conservan su notación completa: `T`, `2M`, `4J`, `5J`, etc.
+- La calidad implícita (mayor o menor) depende de los acordes seleccionados:
+  - Si el usuario seleccionó **solo acordes mayores**: `3` = 3M, `6` = 6M, `7` = 7M
+  - Si el usuario seleccionó **solo acordes menores**: `3` = 3m, `6` = 6m, `7` = 7m
+  - Si el usuario seleccionó **ambos (mayor y menor)**: los chips siguen viéndose igual, pero internamente `3` = 3M + 3m, `6` = 6M + 6m, `7` = 7M + 7m
+- Cuando se genera una pregunta con un acorde mayor, el sistema usará los intervalos mayores (3M, 6M, 7M); si es un acorde menor, usará los menores (3m, 6m, 7m). El motor de sesión hace este mapeo automáticamente.
+- Se requiere seleccionar al menos 2 intervalos para poder comenzar el ejercicio.
+
 La app va a estar dividida por módulos
 
 ## Pantallas
@@ -113,6 +126,7 @@ Opciones, sólo se elige una
 - Notas de la escala
     
     Sólo te va a preguntar notas de la escala y de la triada o tétrada. Si el contexto es de triada mayor, se van a pregunta notas de la escala mayor, si el contexto es de tétrada menor maj7, te va a preguntar notas de la escala menor y a parte el intervalo maj7, si el contexto es aumentado, te preguntará notas de la escala mayor y se agrega el intervalo de 5# y así sucesivamente.
+    Si el usuario selecciona Scale notes, se desglozará un select check box de las notas (intervalos) de la escala, por defecto van a estar preselecconadas todas, también habrá una opción de 'All' que preselecciona todo, una vez seleccione las notas deseadas y comience su entrenamiento, las opciones y lo que pregunté el sistema será acorde a lo que seleccionó debe seleccionar al menos dos notas en el select checkbox, de lo contrario el botón de comenzar estará inhabilitado
     
 - Todas las notas posibles - Esta opción sólo estará disponible para triadas y tétradas mayores, menores, maj7 y m7 (esto también se explica en el tooltip). Si el usuario selecciona esta opción, de deshabilita el input de triadas y tétradas a prácticar.
     

@@ -35,6 +35,8 @@ export interface ExerciseConfig {
   triads: TriadType[];
   tetrads: TetradType[];
   targetNotes: TargetNotes;
+  /** Active when targetNotes === "scaleNotes": the subset of scale intervals to ask. */
+  scaleIntervals: IntervalSymbol[];
   count: number;
   melodicSequence: boolean;
 }
@@ -51,4 +53,6 @@ export interface SessionResult {
   timeElapsed: string;
   breakdown: ChordResult[];
   insight: string;
+  /** Intervals practiced when targetNotes was "scaleNotes" */
+  selectedScaleIntervals?: IntervalSymbol[];
 }

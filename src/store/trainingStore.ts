@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import type {
   ExerciseConfig,
+  IntervalSymbol,
   TriadType,
   TetradType,
   TargetNotes,
@@ -18,6 +19,7 @@ interface TrainingState {
   selectAllTriads: () => void;
   selectAllTetrads: () => void;
   setTargetNotes: (target: TargetNotes) => void;
+  setScaleIntervals: (intervals: IntervalSymbol[]) => void;
   setExerciseCount: (count: number) => void;
   toggleMelodicSequence: () => void;
 
@@ -36,11 +38,22 @@ const ALL_TRIADS: TriadType[] = [
 ];
 const ALL_TETRADS: TetradType[] = ["maj7", "7", "maj6", "mMaj7", "m7"];
 
+/**
+ * Default scale intervals includes both major and minor quality-sensitive variants
+ * (3M+3m, 6M+6m, 7M+7m) because the default triads selection is both major+minor.
+ * In "both" mode, a chip like "3" requires ALL its symbols ["3M","3m"] to be present
+ * to appear selected. Starting with both variants ensures all chips start selected.
+ */
+const DEFAULT_SCALE_INTERVALS: IntervalSymbol[] = [
+  "T", "2M", "3M", "3m", "4J", "5J", "6M", "6m", "7M", "7m",
+];
+
 export const useTrainingStore = create<TrainingState>((set) => ({
   config: {
     triads: ["major", "minor"],
     tetrads: ["7", "m7"],
     targetNotes: "chordTones",
+    scaleIntervals: DEFAULT_SCALE_INTERVALS,
     count: DEFAULT_EXERCISE_COUNT,
     melodicSequence: true,
   },
@@ -84,6 +97,9 @@ export const useTrainingStore = create<TrainingState>((set) => ({
 
   setTargetNotes: (targetNotes) =>
     set((state) => ({ config: { ...state.config, targetNotes } })),
+
+  setScaleIntervals: (scaleIntervals) =>
+    set((state) => ({ config: { ...state.config, scaleIntervals } })),
 
   setExerciseCount: (count) =>
     set((state) => ({ config: { ...state.config, count } })),

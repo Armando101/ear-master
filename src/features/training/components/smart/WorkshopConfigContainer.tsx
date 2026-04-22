@@ -16,12 +16,18 @@ export default function WorkshopConfigContainer() {
     selectAllTriads,
     selectAllTetrads,
     setTargetNotes,
+    setScaleIntervals,
     setExerciseCount,
     toggleMelodicSequence,
   } = useTrainingStore();
 
-  const hasSelection =
-    config.triads.length > 0 || config.tetrads.length > 0;
+  const hasChordSelection = config.triads.length > 0 || config.tetrads.length > 0;
+
+  // When "scaleNotes" is active, also require ≥ 2 intervals selected
+  const scaleIntervalOk =
+    config.targetNotes !== "scaleNotes" || config.scaleIntervals.length >= 2;
+
+  const canStart = hasChordSelection && scaleIntervalOk;
 
   const handleStart = () => {
     router.push("/training/session");
@@ -53,6 +59,9 @@ export default function WorkshopConfigContainer() {
           <TargetNotesSection
             value={config.targetNotes}
             onChange={setTargetNotes}
+            scaleIntervals={config.scaleIntervals}
+            onScaleIntervalsChange={setScaleIntervals}
+            selectedTriads={config.triads}
           />
         </section>
 
@@ -64,7 +73,7 @@ export default function WorkshopConfigContainer() {
             onCountChange={setExerciseCount}
             onToggleMelodicSequence={toggleMelodicSequence}
           />
-          <StartButton onClick={handleStart} disabled={!hasSelection} />
+          <StartButton onClick={handleStart} disabled={!canStart} />
         </aside>
       </div>
     </div>
